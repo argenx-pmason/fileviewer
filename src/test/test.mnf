@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest version="2.1" type="PUBLISHED">
+  <job
+    jobPath="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/jobs/job_t_ae.job"
+    jobName="job_t_ae.job" jobDescription="" jobVersion="1.0"
+    uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/jobs/job_t_ae.job?id=4a516543-f2c0-4bd7-a7f0-ad0b775dc35f&amp;version=1.0"
+    isVersioned="true" modDate="20220616185912EDT" syncVersion="1.0" />
+  <jobSubmission jobSubmissionId="1c25d736-20e6-481d-9d4b-9e1fb667fb03" />
+  <tasks>
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas?id=1e567b2e-58ef-4269-8467-cd4049149e3e&amp;version=1.0"
+      syncVersion="1.0" isVersioned="true" modDate="20220616183817EDT" state="WARNINGS" info=""
+      executionTime="11685" size="10036" />
+  </tasks>
+  <inputs>
+    <file
+      uri="sdd:///general/biostat/macros/_library/setenv01.sas?id=726c18d0-ee14-4ab8-a557-c4cf249dc542&amp;version=2.7"
+      isVersioned="true" modDate="20220330074036EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="2.7" size="11283" />
+    <file
+      uri="work:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/macros/global_macros/setenv01.sas?workspace=669a79d5-e506-468c-a3d7-ac7c306ca6d9"
+      isVersioned="false" modDate="20220616190005EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/setsasautos.sas?id=05d132e6-ff1e-4614-974a-7acfeeac2ad4&amp;version=0.9"
+      isVersioned="true" modDate="20220301092421EST"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.9" size="3915" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/ini.sas?id=7210645e-53e0-4926-be4c-7345b5ff20f7&amp;version=3.10"
+      isVersioned="true" modDate="20220615040008EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="3.10" size="7268" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/readrepeventmeta.sas?id=c8a90fd7-385e-4f24-9095-8daf0bcc731e&amp;version=1.18"
+      isVersioned="true" modDate="20220427063004EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="1.18" size="19012" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/varexist.sas?id=ccbb0e98-c057-4912-b1d2-abdaa93bf228&amp;version=0.1"
+      isVersioned="true" modDate="20201201073559EST"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.1" size="1196" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/getfiledate.sas?id=413dc90d-8c32-44d7-af64-3e7acd6c8acb&amp;version=1.1"
+      isVersioned="true" modDate="20220531032330EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="1.1" size="2562" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/1802-tlf.xlsx?id=5b072b50-ac8a-4035-a4ed-e72d15f335cb"
+      isVersioned="false" modDate="20220613074356EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="15737" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/uni_vtype.sas?id=fa6518a5-65b2-43dd-8474-729e5ed9f440&amp;version=0.2"
+      isVersioned="true" modDate="20220407023403EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.2" size="18370" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/uni_vlength.sas?id=856b896e-7e65-4c7a-ba25-fdeb5508bd31&amp;version=0.3"
+      isVersioned="true" modDate="20220518062554EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.3" size="13944" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/dsattr.sas?id=d0c3bb99-80f7-469d-9e35-840e20a01652&amp;version=0.4"
+      isVersioned="true" modDate="20220521172654EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.4" size="25339" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/repeventmetaoutputfilenamerule.sas?id=b8927d3a-7b10-445d-b29c-f954f3e65ac7&amp;version=1.0"
+      isVersioned="true" modDate="20210422131743EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="1.0" size="1666" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/varlist.sas?id=150b247e-0a98-4180-a9ff-49969b13c172&amp;version=0.3"
+      isVersioned="true" modDate="20220517120557EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.3" size="213443" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/setrepepaths.sas?id=d06d9fa2-a90c-44d5-aa3f-3f7f40cc5502&amp;version=3.6"
+      isVersioned="true" modDate="20220217103528EST"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="3.6" size="4915" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/direxist.sas?id=45a2d0fe-8cd5-4359-8c1c-27d150e9bc80&amp;version=1.4"
+      isVersioned="true" modDate="20220107081145EST"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="1.4" size="14514" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/setpaths.sas?id=f815099c-fe28-45af-9cbf-936894cfda6c&amp;version=2.10"
+      isVersioned="true" modDate="20220531025352EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="2.10" size="7097" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/isblank.sas?id=541bf320-0c25-48a1-b062-e572fc035c67&amp;version=0.1"
+      isVersioned="true" modDate="20201201073604EST"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.1" size="350" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/obscnt.sas?id=e33c2e50-2eac-405a-a88a-76320dd9f56f&amp;version=0.1"
+      isVersioned="true" modDate="20201201073608EST"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.1" size="614" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/get_job_prog_info.sas?id=63784141-115e-4dbe-b8c0-0eccc96f67b4&amp;version=0.1"
+      isVersioned="true" modDate="20210625015209EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.1" size="7594" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/jobs/job_t_ae.job?id=4a516543-f2c0-4bd7-a7f0-ad0b775dc35f&amp;version=1.0"
+      isVersioned="true" modDate="20220616185912EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="1.0" size="2392" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/lsaf_get_version.sas?id=aa1e5b1d-02a8-44d5-bae7-43e7f4d1bd7a&amp;version=0.1"
+      isVersioned="true" modDate="20210330064932EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.1" size="1021" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/local_lsaf.sas?id=6415c588-3d71-49c3-b9d6-05bd8023522f&amp;version=0.2"
+      isVersioned="true" modDate="20220531032635EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.2" size="8134" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/titles.sas?id=36e1c37c-00c1-4a7f-bcbd-f32a0c15d4b0&amp;version=3.4"
+      isVersioned="true" modDate="20220615041729EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="3.4" size="21709" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/odsdest.sas?id=d6885b47-f57b-4fb2-8608-37287f572cb2&amp;version=0.1"
+      isVersioned="true" modDate="20211110123256EST"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.1" size="33586" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/repeventtitles.sas?id=562a0266-8da7-449b-a0ff-c9d2199b5b2d&amp;version=0.2"
+      isVersioned="true" modDate="20220208084709EST"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.2" size="1305" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/title_next.sas?id=cac9ddc7-1a58-47b4-959d-b6d9cb9b68c0&amp;version=0.1"
+      isVersioned="true" modDate="20211110123430EST"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.1" size="31316" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/ods_html5.sas?id=d081d477-bd7d-4f0f-945d-2b163400c4fd&amp;version=0.3"
+      isVersioned="true" modDate="20211119063634EST"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.3" size="4111" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/odshtmtext.sas?id=bb0a56be-4421-4871-9c58-ba95dab137a7&amp;version=0.1"
+      isVersioned="true" modDate="20210429050433EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.1" size="8054" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/ods_hyperlink.sas?id=f4b254ab-5629-48cc-b481-37545623413b&amp;version=0.1"
+      isVersioned="true" modDate="20210429050453EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.1" size="15577" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/macros/global_macros/programend.sas?id=35aaf8f1-95a7-49ee-be67-46cacf96664d"
+      isVersioned="false" modDate="20220413043429EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="26526" />
+    <file
+      uri="work:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/log/t_14.3.1.1_t_ae.log?workspace=669a79d5-e506-468c-a3d7-ac7c306ca6d9"
+      isVersioned="false" modDate="20220616190003EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="" />
+    <file
+      uri="sdd:///general/biostat/macros/_library/log2json.sas?id=ee1445a0-d4d9-46a9-8fb6-f54e08bdc03c&amp;version=0.13"
+      isVersioned="true" modDate="20220402135353EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="0.13" size="4838" />
+    <file
+      uri="work:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/log/t_14.3.1.2_t_ae.log?workspace=669a79d5-e506-468c-a3d7-ac7c306ca6d9"
+      isVersioned="false" modDate="20220616190003EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="" />
+    <file
+      uri="work:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/log/t_14.3.1.3_t_ae.log?workspace=669a79d5-e506-468c-a3d7-ac7c306ca6d9"
+      isVersioned="false" modDate="20220616190004EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="" />
+    <file
+      uri="sdd:///general/biostat/metadata/projects/meta.sas7bdat?id=7f6a6acf-780c-4713-85f9-04808c8a5347"
+      isVersioned="false" modDate="20220616120931EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="131072" />
+    <file
+      uri="work:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/repemeta.sas7bdat?workspace=669a79d5-e506-468c-a3d7-ac7c306ca6d9"
+      isVersioned="false" modDate="20220616190001EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="" />
+    <file
+      uri="work:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/repemeta_resolved.sas7bdat?workspace=669a79d5-e506-468c-a3d7-ac7c306ca6d9"
+      isVersioned="false" modDate="20220616190001EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="" />
+    <file
+      uri="work:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/vrepemeta.sas7bvew?workspace=669a79d5-e506-468c-a3d7-ac7c306ca6d9"
+      isVersioned="false" modDate="20220616190002EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="" />
+    <file
+      uri="work:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/repesourcedata.sas7bdat?workspace=669a79d5-e506-468c-a3d7-ac7c306ca6d9"
+      isVersioned="false" modDate="20220616190001EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      syncVersion="" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/data_received/adam_testrun1_13MAY2022/adsl.sas7bdat?id=430b6630-f896-41fe-a6f4-effc6e5b4fa7"
+      isVersioned="false" modDate="20220513183951EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="1048576" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/data_received/adam_testrun1_13MAY2022/adae.sas7bdat?id=15b6351a-0aba-4294-8856-4fe69a5a36b4"
+      isVersioned="false" modDate="20220513183918EDT"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="512000" />
+    <ref name="setenv.sas" location="/lsafshared/SASWorkspaces/global_macros"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="lowcase.sas" location="/sso/sfw/sas/940/SASFoundation/9.4/sasautos"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="lsaf_getproperties.sas"
+      location="/sso/sfw/sas/940/SASFoundation/9.4/lsafapi/lsaf-sas-macro-2.3/sasmacros"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="lsaf_getproductname.sas"
+      location="/sso/sfw/sas/940/SASFoundation/9.4/lsafapi/lsaf-sas-macro-2.3/sasmacros"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="lsaf_exists.sas"
+      location="/sso/sfw/sas/940/SASFoundation/9.4/lsafapi/lsaf-sas-macro-2.3/sasmacros"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="lsaf_copy.sas"
+      location="/sso/sfw/sas/940/SASFoundation/9.4/lsafapi/lsaf-sas-macro-2.3/sasmacros"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="lsaf_submitjob.sas"
+      location="/sso/sfw/sas/940/SASFoundation/9.4/lsafapi/lsaf-sas-macro-2.3/sasmacros"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="cmpres.sas" location="/sso/sfw/sas/940/SASFoundation/9.4/sasautos"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="left.sas" location="/sso/sfw/sas/940/SASFoundation/9.4/sasautos"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="qtrim.sas" location="/sso/sfw/sas/940/SASFoundation/9.4/sasautos"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="verify.sas" location="/sso/sfw/sas/940/SASFoundation/9.4/sasautos"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="lsaf_validate_parameters_dataset.sas"
+      location="/sso/sfw/sas/940/SASFoundation/9.4/lsafapi/lsaf-sas-macro-2.3/sasmacros"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="lsaf_validate_sasdataset.sas"
+      location="/sso/sfw/sas/940/SASFoundation/9.4/lsafapi/lsaf-sas-macro-2.3/sasmacros"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="qcmpres.sas" location="/sso/sfw/sas/940/SASFoundation/9.4/sasautos"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="qleft.sas" location="/sso/sfw/sas/940/SASFoundation/9.4/sasautos"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="vcatalg.sas7bvew" location="/sso/sfw/sas/940/SASFoundation/9.4/sashelp"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="vmacro.sas7bvew" location="/sso/sfw/sas/940/SASFoundation/9.4/sashelp"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="vextfl.sas7bvew" location="/sso/sfw/sas/940/SASFoundation/9.4/sashelp"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="vcolumn.sas7bvew" location="/sso/sfw/sas/940/SASFoundation/9.4/sashelp"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="vdest.sas7bvew" location="/sso/sfw/sas/940/SASFoundation/9.4/sashelp"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+    <ref name="vtitle.sas7bvew" location="/sso/sfw/sas/940/SASFoundation/9.4/sashelp"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas" />
+  </inputs>
+  <outputs>
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/log/job_t_ae.log?id=63029795-b52c-48b0-8544-fc56fa32cd49"
+      isVersioned="false" modDate="20220616190003EDT" wasSynced="true" size="451756" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/lst/job_t_ae.lst?id=17f0d5da-1162-405b-af37-6b2793c4fd6a"
+      isVersioned="false" modDate="20220616190004EDT" wasSynced="true" size="608" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/macros/global_macros/setenv01.sas?id=97e5f2c8-ca4c-47de-8ed4-174e5ad2f66f"
+      isVersioned="false" modDate="20220616190005EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="11065" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/repemeta.json?id=c46ba663-67b5-4638-8bba-0e0f7db95f96"
+      isVersioned="false" modDate="20220616190001EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="8101" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/lst/t_ae.lst?id=e27b5a2a-f134-419b-af28-b3eac6930391"
+      isVersioned="false" modDate="20220616190005EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="0" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/log/t_ae.log?id=1b57fe50-8bad-4f42-8b4e-a5aedf155f51"
+      isVersioned="false" modDate="20220616190004EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="24876" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/lst/t_14.3.1.1_t_ae.lst?id=d80f49b9-31c3-4190-8e05-f84364d45cd7"
+      isVersioned="false" modDate="20220616190004EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="0" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/log/t_14.3.1.1_t_ae.log?id=dc1ab067-f143-427c-bca7-47472075168b"
+      isVersioned="false" modDate="20220616190003EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="36730" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/output/t_14.3.1.1_t_ae.lst?id=1c39e750-3801-4e01-afed-ad3a8c13f5c1"
+      isVersioned="false" modDate="20220616190005EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="4333" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/log/t_ae.html?id=74424d71-ec4a-4aad-8a82-150fb9523d03"
+      isVersioned="false" modDate="20220616190004EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="38183" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/meta/log_t_14.3.1.1_t_ae.json?id=e1249f03-d183-4d24-af91-d025e41d5612"
+      isVersioned="false" modDate="20220616190000EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="642" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/lst/t_14.3.1.2_t_ae.lst?id=cdc99b4a-8bdc-4f12-9745-b412e6aa6322"
+      isVersioned="false" modDate="20220616190004EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="0" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/log/t_14.3.1.2_t_ae.log?id=f51a4644-5bc1-4033-90fa-b51586854e3a"
+      isVersioned="false" modDate="20220616190003EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="34730" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/output/t_14.3.1.2_t_ae.lst?id=bd6244e1-991c-4797-a579-dd32c58aa787"
+      isVersioned="false" modDate="20220616190005EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="7479" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/meta/log_t_14.3.1.2_t_ae.json?id=aed8b1ca-79b4-415c-9180-b7ad5f8c5335"
+      isVersioned="false" modDate="20220616190000EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="642" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/lst/t_14.3.1.3_t_ae.lst?id=cf793cd7-7540-4e91-82b0-7075e7beb3ba"
+      isVersioned="false" modDate="20220616190005EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="0" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/log/t_14.3.1.3_t_ae.log?id=76c2a6bf-999e-41b9-84f5-94b406213119"
+      isVersioned="false" modDate="20220616190004EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="34881" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/output/t_14.3.1.3_t_ae.lst?id=612092d6-2083-494f-a1fc-623202dae203"
+      isVersioned="false" modDate="20220616190006EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="7479" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/meta/log_t_14.3.1.3_t_ae.json?id=b7a7d6d8-c904-43bd-b5e1-5d1a11901d79"
+      isVersioned="false" modDate="20220616190001EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="642" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/repemeta.sas7bdat?id=c1b7eb9a-11a5-45ae-b17c-a618ae30176a"
+      isVersioned="false" modDate="20220616190001EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="196608" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/repemeta_resolved.sas7bdat?id=f9f00ecc-734b-4244-a84b-4889e46aaafb"
+      isVersioned="false" modDate="20220616190001EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="196608" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/vrepemeta.sas7bvew?id=53c773c3-8e8e-449f-b4cb-ba9fd118df9d"
+      isVersioned="false" modDate="20220616190002EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="24576" />
+    <file
+      uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/documents/repesourcedata.sas7bdat?id=bdc4c49b-5999-438e-b453-66ccb511bd2b"
+      isVersioned="false" modDate="20220616190001EDT" wasSynced="true"
+      referencingSASFile="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/programs/t_ae.sas"
+      size="196608" />
+  </outputs>
+  <outputFileSpec enableVersioningForNewFiles="false">
+    <versionType type="MAJOR" />
+  </outputFileSpec>
+  <log
+    uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/log/job_t_ae.log?id=63029795-b52c-48b0-8544-fc56fa32cd49"
+    isVersioned="false" modDate="20220616190003EDT" wasSynced="true" />
+  <lst
+    uri="sdd:///clinical/argx-113/cidp/argx-113-1802/biostat/staging/testrun1/qc_tlf/lst/job_t_ae.lst?id=17f0d5da-1162-405b-af37-6b2793c4fd6a"
+    isVersioned="false" modDate="20220616190004EDT" wasSynced="true" />
+  <mnf />
+  <parameters />
+  <metrics>
+    <transferMetrics>
+      <transferMetric name="jobs" total="1" size="2392" time="4" />
+      <transferMetric name="programs" total="1" size="10036" time="3" />
+      <transferMetric name="inputs" total="192" size="209393886" time="2530" />
+      <transferMetric name="referenced" total="32" size="2216644" time="69" />
+      <transferMetric name="outputs" total="23" size="1276547" time="5516" />
+    </transferMetrics>
+  </metrics>
+</manifest>

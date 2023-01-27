@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Job created: 2022-06-16T23:33:46 By: CREATEJOB User: sshipp Environment: local -->
+<job releaseVersion="1.0" description="" log="../log" lst="../lst" mnf="../manifest">
+  <tasks>
+    <task path="../programs/t_ae.sas" />
+  </tasks>
+  <taskSpecs>
+    <inputSpec path="../programs/t_ae.sas" type="FILE" version="*" includeSubFolders="false" />
+  </taskSpecs>
+  <otherSpecs>
+    <inputSpec path="/general/biostat/metadata/projects/projectsmeta.xlsx" type="FILE" version="*" includeSubFolders="false" />
+    <inputSpec path="/general/biostat/metadata/projects/meta.sas7bdat" type="FILE" version="*" includeSubFolders="false" />
+    <inputSpec path="/general/biostat/macros/_library/*" type="FILE" version="*" includeSubFolders="false" />
+    <inputSpec path="../documents/*" type="FILE" version="*" includeSubFolders="false" />
+    <inputSpec path="../macros" type="CONTAINER" version="" includeSubFolders="true" />
+    <inputSpec path="../programs" type="CONTAINER" version="" includeSubFolders="true" />
+    <inputSpec path="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/data_received/adam_testrun1_13MAY2022" type="CONTAINER" version="" includeSubFolders="false" />
+    <inputSpec path="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/data_received/adam_testrun1_13MAY2022/adae.sas7bdat" type="FILE" version="*" includeSubFolders="false" />
+    <inputSpec path="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/data_received/adam_testrun1_13MAY2022/adsl.sas7bdat" type="FILE" version="*" includeSubFolders="false" />
+    <inputSpec path="/clinical/argx-113/cidp/argx-113-1802/biostat/staging/data_received/sdtm_20220331_testrun1" type="CONTAINER" version="" includeSubFolders="false" />
+  </otherSpecs>
+  <outputPaths>
+    <outputPath path="../documents" includeSubFolders="true" />
+    <outputPath path="../documents/" includeSubFolders="true" />
+    <outputPath path="../log/" includeSubFolders="true" />
+    <outputPath path="../lst/" includeSubFolders="true" />
+    <outputPath path="../output/" includeSubFolders="true" />
+    <outputPath path="../programs" includeSubFolders="true" />
+    <outputPath path="../macros"    includeSubFolders="true" />
+  </outputPaths>
+  <outputSpec enableVersioningForNewFiles="false">
+    <versionType type="MAJOR" />
+  </outputSpec>
+  <parameters />
+</job>

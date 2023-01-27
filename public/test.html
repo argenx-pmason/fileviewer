@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <script>
+      // Create an XMLHttpRequest object
+      const url =
+          "https://xarprod.ondemand.sas.com/lsaf/webdav/repo/general/biostat/tools/fcmp/fcmp_run.sas", // this is a webDAV URL
+        callback = (resp) => {
+          const lastModifiedDate = resp.responseText
+            .split("<d:getlastmodified>")[1]
+            .split("<")[0];
+          alert(lastModifiedDate); // this is what we want
+        },
+        xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (
+          this.readyState === 4 &&
+          (this.status === 207 || this.status === 200)
+        ) {
+          callback(this);
+        }
+      };
+      // Send a request
+      xhttp.open("PROPFIND", url, false);
+      xhttp.setRequestHeader("Depth", "1");
+      let xmlData =
+        "<?xml version='1.0' encoding='UTF-8'?>" +
+        "  <d:propfind  xmlns:d='DAV:' xmlns:sc='http://www.sas.com/sas'>" +
+        "     <d:prop>" +
+        "        <d:displayname /> " +
+        "        <d:creationdate/> <d:getlastmodified />  <d:getetag />  <d:getcontenttype />  <d:resourcetype />  <sc:checkedOut />  <sc:locked />   <sc:version /> " +
+        "     </d:prop>" +
+        "  </d:propfind>";
+      xhttp.send(xmlData);
+    </script>
+  </head>
+</html>
