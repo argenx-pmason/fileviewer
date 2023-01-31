@@ -25,6 +25,7 @@ import {
   Link,
   ArrowDropDown,
   ArrowDropUp,
+  ArrowCircleUp,
 } from "@mui/icons-material";
 // import {DataGrid } from "@mui/x-data-grid";
 import { DataGridPro } from "@mui/x-data-grid-pro";
@@ -63,15 +64,14 @@ export default function App() {
   let pageNumber = 1;
   const urlPrefix = window.location.protocol + "//" + window.location.host,
     { href } = window.location,
+    buttonBackground = "#e8e8e8",
     mode = href.startsWith("http://localhost") ? "local" : "remote",
     fileRef = createRef(),
     [windowDimension, detectHW] = useState({
       winWidth: window.innerWidth,
       winHeight: window.innerHeight,
     }),
-    [fileDirectory, setFileDirectory] = useState(
-      "/general/biostat/jobs/gadam_ongoing_studies/dev/logs/"
-    ),
+    [fileDirectory, setFileDirectory] = useState("/clinical/"),
     [showPageBreaks, setShowPageBreaks] = useState(true),
     [alternateLayout, setAlternateLayout] = useState(true),
     detectSize = () => {
@@ -139,6 +139,7 @@ export default function App() {
         download: filename,
       }).click(),
     processText = (file, ft) => {
+      setWaitGetDir(true);
       fetch(file).then(function (response) {
         // console.log(response);
         response.text().then(function (text) {
@@ -147,6 +148,7 @@ export default function App() {
           setContent(newText);
           setFileViewerType(ft);
           setFileType("txt");
+          setWaitGetDir(false);
         });
       });
     },
@@ -315,12 +317,14 @@ export default function App() {
         // setFileType(tempFileType);
         // console.log("tempFileType", tempFileType, "url", url);
         if (["xlsx", "csv"].includes(tempFileType)) {
+          setWaitGetDir(true);
           // setFileType("excel");
           fetch(url).then((response) => {
             // console.log("response", response);
             response.arrayBuffer().then((resp) => {
               // console.log("resp", resp);
               processExcel(resp);
+              setWaitGetDir(false);
             });
           });
         } else if (["pdf"].includes(tempFileType)) {
@@ -330,15 +334,16 @@ export default function App() {
           setImageFile(url);
           setFileType("image");
         } else {
-          console.log(
-            "tempFileType",
-            tempFileType,
-            "splitDots",
-            splitDots,
-            "isDirectory",
-            isDirectory
-          );
+          // console.log(
+          //   "tempFileType",
+          //   tempFileType,
+          //   "splitDots",
+          //   splitDots,
+          //   "isDirectory",
+          //   isDirectory
+          // );
           if (splitDots.length > 0) {
+            setWaitGetDir(true);
             // process file depending on file type
             fetch(url).then(function (response) {
               response.text().then(function (text) {
@@ -355,6 +360,7 @@ export default function App() {
                   default:
                     setFileViewerType(tempFileType);
                 }
+                setWaitGetDir(false);
               });
             });
           }
@@ -480,7 +486,7 @@ export default function App() {
           return 0;
         });
 
-      console.log("files", files);
+      // console.log("files", files);
       const numberOfFilesFound = files.filter(
           (f) => f !== null && !f.isDirectory
         ).length,
@@ -504,9 +510,33 @@ export default function App() {
       });
       chunk += "</table>";
       setFileType("html");
-      console.log("chunk", chunk);
+      // console.log("chunk", chunk);
       setOriginalContent(chunk);
       setContent(chunk);
+    },
+    experimentOptions = {
+      method: "put",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": "41d6dd33-cfa1-4a6d-9cfc-77e821ce6ec1",
+      },
+      body: JSON.stringify({
+        path: "/general/biostat/gadam/documents/gadam_dshb/adam_msg.sas7bdat",
+        location: "REPOSITORY",
+        version: null,
+        refresh: true,
+        includeInfo: true,
+        start: 0,
+        limit: 1000,
+      }),
+    },
+    experiment = () => {
+      fetch(
+        "https://xarprod.ondemand.sas.com/lsaf/rest/dataview/278b7216-e082-4452-9c20-e85fa1298a19/data",
+        experimentOptions
+      ).then((response) => {
+        console.log("response", response);
+      });
     };
 
   useEffect(() => {
@@ -517,11 +547,8 @@ export default function App() {
   }, [windowDimension]);
 
   useEffect(() => {
-    const splitQuestionMarks = href.startsWith("localhost")
-        ? "http://localhost:3000/:f:/r/sites/Biostatistics/Programming%20documentation/codesamples?file=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-113/mg/argx-113-1704/biostat/staging/gba/output/txt/t_3.1.1.5_t_ae.txt".split(
-            "?"
-          )
-        : href.split("?"),
+    if (mode === "local") return;
+    const splitQuestionMarks = href.split("?"),
       urlPrefix = window.location.protocol + "//" + window.location.host,
       filePrefix = "/lsaf/filedownload/sdd%3A//";
     if (splitQuestionMarks.length > 1) {
@@ -531,7 +558,7 @@ export default function App() {
           ? partialFile
           : urlPrefix + filePrefix + partialFile,
         tempFileName = file.split("/").pop(),
-        tempFileType = tempFileName.split(".")[1];
+        tempFileType = tempFileName.split(".").pop();
       document.title = tempFileName;
       setURL(file);
       getFile(file);
@@ -546,7 +573,7 @@ export default function App() {
       // console.log("fileDir", fileDir);
       // Assumption: if filename has a . then it is a file, but if not it is a directory
       // console.log(tempFileName.split(".").length);
-      if (tempFileName.split(".").length === 2) setFileDirectory("/" + fileDir);
+      if (tempFileName.split(".").length > 1) setFileDirectory("/" + fileDir);
       else {
         if (partialFile.substring(0, 1) !== "/") {
           setFileDirectory("/" + partialFile);
@@ -557,13 +584,15 @@ export default function App() {
         }
       }
     } else {
-      fetch(test_lst)
-        .then((r) => r.text())
-        .then((r) => {
-          setOriginalContent(r);
-          const newText = analyse(r);
-          setContent(newText);
-        });
+      console.log(mode, fileDirectory);
+      getWebDav(fileDirectory);
+      // fetch(test_lst)
+      //   .then((r) => r.text())
+      //   .then((r) => {
+      //     setOriginalContent(r);
+      //     const newText = analyse(r);
+      //     setContent(newText);
+      //   });
     }
     // eslint-disable-next-line
   }, [href]);
@@ -593,7 +622,7 @@ export default function App() {
       <Grid container spacing={2}>
         {
           <>
-            <Grid item xs={6}>
+            <Grid item xs={5}>
               <Box
                 variant={"dense"}
                 sx={{
@@ -606,6 +635,7 @@ export default function App() {
                     onClick={() => {
                       setFontSize(fontSize - 1);
                     }}
+                    sx={{ backgroundColor: buttonBackground }}
                   >
                     <Remove />
                   </IconButton>
@@ -615,6 +645,7 @@ export default function App() {
                     onClick={() => {
                       setFontSize(12);
                     }}
+                    sx={{ backgroundColor: buttonBackground }}
                   >
                     <RestartAlt />
                   </IconButton>
@@ -624,6 +655,7 @@ export default function App() {
                     onClick={() => {
                       setFontSize(fontSize + 1);
                     }}
+                    sx={{ backgroundColor: buttonBackground }}
                   >
                     <Add />
                   </IconButton>
@@ -633,6 +665,7 @@ export default function App() {
                     onClick={() => {
                       downloadFile(url, fileName);
                     }}
+                    sx={{ backgroundColor: buttonBackground }}
                   >
                     <Download />
                   </IconButton>
@@ -642,6 +675,7 @@ export default function App() {
                     onClick={() => {
                       openInNewTab(`${url}`);
                     }}
+                    sx={{ backgroundColor: buttonBackground }}
                   >
                     <FolderOpen />
                   </IconButton>
@@ -651,48 +685,57 @@ export default function App() {
                     onClick={() => {
                       navigator.clipboard.writeText(content);
                     }}
+                    sx={{ backgroundColor: buttonBackground }}
                   >
                     <ContentCopy />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title="Show previous file">
-                  <IconButton
-                    onClick={() => {
-                      const id = selectedFile ? selectedFile.id : 1,
-                        newId = id === 0 ? id : id - 1;
-                      // console.log(listOfFiles, selectedFile, id, newId);
-                      if (id !== newId) selectFile(listOfFiles[newId]);
-                    }}
-                  >
-                    <ArrowDropUp />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Show next file">
-                  <IconButton
-                    onClick={() => {
-                      const id = selectedFile ? selectedFile.id : -1,
-                        length = listOfFiles.length,
-                        newId = id === length - 1 ? id : id + 1;
-                      // console.log(listOfFiles, selectedFile, id, newId, length);
-                      if (id !== newId) selectFile(listOfFiles[newId]);
-                    }}
-                  >
-                    <ArrowDropDown />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Show Page Breaks (plain text files)">
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={showPageBreaks}
-                        onChange={() => {
-                          setShowPageBreaks(!showPageBreaks);
-                        }}
-                        name="pagebreaks"
-                      />
-                    }
-                  />
-                </Tooltip>
+                {listOfFiles && listOfFiles.length > 0 && (
+                  <Tooltip title="Show previous file">
+                    <IconButton
+                      onClick={() => {
+                        const id = selectedFile ? selectedFile.id : 1,
+                          newId = id === 0 ? id : id - 1;
+                        // console.log(listOfFiles, selectedFile, id, newId);
+                        if (id !== newId) selectFile(listOfFiles[newId]);
+                      }}
+                      sx={{ backgroundColor: buttonBackground }}
+                    >
+                      <ArrowDropUp />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {listOfFiles && listOfFiles.length > 0 && (
+                  <Tooltip title="Show next file">
+                    <IconButton
+                      onClick={() => {
+                        const id = selectedFile ? selectedFile.id : -1,
+                          length = listOfFiles.length,
+                          newId = id === length - 1 ? id : id + 1;
+                        // console.log(listOfFiles, selectedFile, id, newId, length);
+                        if (id !== newId) selectFile(listOfFiles[newId]);
+                      }}
+                      sx={{ backgroundColor: buttonBackground }}
+                    >
+                      <ArrowDropDown />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {fileType === "txt" && (
+                  <Tooltip title="Show Page Breaks (plain text files)">
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={showPageBreaks}
+                          onChange={() => {
+                            setShowPageBreaks(!showPageBreaks);
+                          }}
+                          name="pagebreaks"
+                        />
+                      }
+                    />
+                  </Tooltip>
+                )}
                 <Tooltip title="Switch layout">
                   <FormControlLabel
                     control={
@@ -706,59 +749,87 @@ export default function App() {
                     }
                   />
                 </Tooltip>
-                <Tooltip title="Zoom out (images and PDFs)">
-                  <IconButton
-                    onClick={() => {
-                      setImageDelta(imageDelta - 250);
-                    }}
-                  >
-                    <ZoomOut />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Reset to fit width">
-                  <IconButton
-                    onClick={() => {
-                      setImageDelta(0);
-                    }}
-                  >
-                    <RestartAlt />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Zoom in (images and PDFs)">
-                  <IconButton
-                    onClick={() => {
-                      setImageDelta(imageDelta + 250);
-                    }}
-                  >
-                    <ZoomIn />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Toggle fitting image to height">
-                  <IconButton
-                    onClick={() => {
-                      setFitHeight(fitHeight === undefined ? true : !fitHeight);
-                    }}
-                  >
-                    <Height />
-                  </IconButton>
-                </Tooltip>
+                {["image", "pdf", "svg", "jpg", "png"].includes(fileType) && (
+                  <Tooltip title="Zoom out (images and PDFs)">
+                    <IconButton
+                      onClick={() => {
+                        setImageDelta(imageDelta - 250);
+                      }}
+                      sx={{ backgroundColor: buttonBackground }}
+                    >
+                      <ZoomOut />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {["image", "pdf", "svg", "jpg", "png"].includes(fileType) && (
+                  <Tooltip title="Reset to fit width">
+                    <IconButton
+                      onClick={() => {
+                        setImageDelta(0);
+                      }}
+                      sx={{ backgroundColor: buttonBackground }}
+                    >
+                      <RestartAlt />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {["image", "pdf", "svg", "jpg", "png"].includes(fileType) && (
+                  <Tooltip title="Zoom in (images and PDFs)">
+                    <IconButton
+                      onClick={() => {
+                        setImageDelta(imageDelta + 250);
+                      }}
+                      sx={{ backgroundColor: buttonBackground }}
+                    >
+                      <ZoomIn />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {["image", "svg", "jpg", "png"].includes(fileType) && (
+                  <Tooltip title="Toggle fitting image to height">
+                    <IconButton
+                      onClick={() => {
+                        setFitHeight(
+                          fitHeight === undefined ? true : !fitHeight
+                        );
+                      }}
+                      sx={{
+                        backgroundColor: fitHeight ? "#e3f2fd" : "#e8e8e8",
+                      }}
+                    >
+                      <Height />
+                    </IconButton>
+                  </Tooltip>
+                )}
                 {fileViewerType === "xml" && (
                   <Tooltip title="Process and show links from XML">
                     <IconButton
                       onClick={() => {
                         processMnf();
                       }}
+                      sx={{ backgroundColor: buttonBackground }}
                     >
                       <Link />
                     </IconButton>
                   </Tooltip>
                 )}
+                <Tooltip title="Experiment">
+                  <IconButton
+                    onClick={() => {
+                      experiment();
+                    }}
+                    sx={{ backgroundColor: buttonBackground, color: "yellow" }}
+                  >
+                    <Link />
+                  </IconButton>
+                </Tooltip>
               </Box>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={7}>
               <Typography
                 sx={{
-                  mt: 1,
+                  mt: 2,
+                  fontSize: 12,
                 }}
               >
                 {url}
@@ -769,11 +840,12 @@ export default function App() {
                 id="fileDirectory"
                 label="Directory"
                 value={fileDirectory}
+                size={"small"}
                 onChange={(e) => setFileDirectory(e.target.value)}
                 sx={{
                   width: alternateLayout
                     ? windowDimension.winWidth / 6
-                    : windowDimension.winWidth - 140,
+                    : windowDimension.winWidth - 240,
                   mt: 1,
                 }}
               />
@@ -784,6 +856,7 @@ export default function App() {
                       setWaitGetDir(true);
                       getWebDav(fileDirectory);
                     }}
+                    size="small"
                     sx={{
                       m: 3,
                       fontSize: 12,
@@ -793,6 +866,27 @@ export default function App() {
                   >
                     Read
                   </Button>
+                </Tooltip>
+              )}
+              {!waitGetDir && (
+                <Tooltip title="Read the directory above">
+                  <IconButton
+                    onClick={() => {
+                      const parent0 = fileDirectory.endsWith("/")
+                          ? fileDirectory.slice(0, -1)
+                          : fileDirectory,
+                        parent1 = parent0.split("/");
+                      parent1.pop();
+                      const parent = parent1.join("/");
+                      // console.log(fileDirectory, parent0, parent1, parent);
+                      setFileDirectory(parent);
+                      setWaitGetDir(true);
+                      getWebDav(parent);
+                    }}
+                    size="small"
+                  >
+                    <ArrowCircleUp />
+                  </IconButton>
                 </Tooltip>
               )}
               {!waitSelectFile &&
@@ -917,7 +1011,9 @@ export default function App() {
                 // style={{ maxHeight: windowDimension.winHeight - topSpace }}
                 className={fileViewerType}
               >
-                {content}
+                {content && content.length > 0
+                  ? content
+                  : "No text to display."}
               </Highlight>
             )}{" "}
           </Box>

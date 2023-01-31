@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <script>
+      const href =
+        "https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A/general/biostat/tools/fileviewer/index.html?file=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/hv/argx-117-1901/biostat/staging/mad5_tables/output/txt/t_14.3.1.5_t_ae_posthoc.txt";
+      const splitQuestionMarks = href.split("?"),
+        urlPrefix = window.location.protocol + "//" + window.location.host,
+        filePrefix = "/lsaf/filedownload/sdd%3A//";
+      if (splitQuestionMarks.length > 1) {
+        const splitEquals = splitQuestionMarks[1].split("="),
+          partialFile = splitEquals[1],
+          file = partialFile.startsWith("http")
+            ? partialFile
+            : urlPrefix + filePrefix + partialFile,
+          tempFileName = file.split("/").pop(),
+          tempFileType = tempFileName.split(".").pop();
+        console.log(
+          urlPrefix,
+          filePrefix,
+          partialFile,
+          file,
+          tempFileName,
+          tempFileType
+        );
+        document.title = tempFileName;
+        // setURL(file);
+        // getFile(file);
+        // setFileName(tempFileName);
+        // setFileType(tempFileType);
+        // setFileViewerType(tempFileType);
+        // set the directory to that of the file which was passed in
+        const fileDirBits = file.split("%3A")[1].split("?")[0].split("/");
+        fileDirBits.pop();
+        const tempFileDir = fileDirBits.filter((element) => element),
+          fileDir = tempFileDir.join("/");
+        console.log("fileDir", fileDir, tempFileDir, fileDirBits);
+        // Assumption: if filename has a . then it is a file, but if not it is a directory
+        console.log("tempFileName", tempFileName);
+        console.log("partialFile", partialFile);
+        if (tempFileName.split(".").length > 1) {
+        }
+        //   setFileDirectory("/" + fileDir);
+        //   console.log("set dir");
+        else {
+          if (partialFile.substring(0, 1) !== "/") {
+            // setFileDirectory("/" + partialFile);
+            // getWebDav("/" + partialFile);
+          } else {
+            // setFileDirectory(partialFile);
+            // getWebDav(partialFile);
+          }
+        }
+      } else {
+        console.log(mode, fileDirectory);
+        getWebDav(fileDirectory);
+        // fetch(test_lst)
+        //   .then((r) => r.text())
+        //   .then((r) => {
+        //     setOriginalContent(r);
+        //     const newText = analyse(r);
+        //     setContent(newText);
+        //   });
+      }
+    </script>
+  </head>
+</html>
