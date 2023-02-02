@@ -1,5 +1,4 @@
 import React, { useState, useEffect, createRef } from "react";
-import Select from "react-select";
 import {
   Grid,
   Box,
@@ -30,24 +29,27 @@ import {
 // import {DataGrid } from "@mui/x-data-grid";
 import { DataGridPro } from "@mui/x-data-grid-pro";
 import { LicenseInfo } from "@mui/x-data-grid-pro";
+// libraries supporting different file types
+import Select from "react-select";
 import { Document, Page } from "react-pdf/dist/esm/entry.webpack";
 import Highlight from "react-highlight";
 import { read, utils } from "xlsx";
 import { xml2json } from "xml-js";
-import "highlight.js/styles/googlecode.css";
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
+// shared functions
 import { getDir, xmlToJson } from "./utility";
+// CSS
+import "highlight.js/styles/googlecode.css";
 import "./App.css";
+// local test sources
 import test_lst from "./test/test.lst";
 import test_txt from "./test/test.txt";
 import test_pdf from "./test/test.pdf";
+import test_doc from "./test/test.docx";
+import test_ppt from "./test/test.pptx";
 import test_xlsx from "./test/test.xlsx";
 import test1_xlsx from "./test/test1.xlsx";
-// import test2_xlsx from "./test/test2.xlsx";
 import test3_xlsx from "./test/test3.xlsx";
-// import test4_xlsx from "./test/test4.xlsx";
-// import test5_xlsx from "./test/test5.xlsx";
-// import test6_xlsx from "./test/test6.xlsx";
-// import test7_xlsx from "./test/test7.xlsx";
 import test_svg from "./test/test.svg";
 import test_png from "./test/test.png";
 import test_jpg from "./test/test.jpg";
@@ -93,6 +95,8 @@ export default function App() {
     [rows, setRows] = useState([null]),
     [cols, setCols] = useState(null),
     [pdfFile, setPdfFile] = useState(null),
+    [pptFile, setPptFile] = useState(null),
+    [docFile, setDocFile] = useState(null),
     [imageFile, setImageFile] = useState(null),
     [fitHeight, setFitHeight] = useState(undefined),
     [page] = useState(1),
@@ -107,6 +111,8 @@ export default function App() {
       "https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd:/general/biostat/tools/logviewer/index.html?log=",
     fileViewerPrefix =
       "https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd:/general/biostat/tools/fileviewer/index.html?file=",
+    // officeFileViewerPrefix =
+    //   "https://view.officeapps.live.com/op/view.aspx?src=",
     // user selects file from list of files loaded from directory
     selectFile = (index) => {
       setWaitSelectFile(true);
@@ -289,6 +295,12 @@ export default function App() {
         } else if (url === "test_pdf") {
           setPdfFile(test_pdf);
           setFileType("pdf");
+        } else if (url === "test_doc") {
+          setDocFile(test_doc);
+          setFileType("doc");
+        } else if (url === "test_ppt") {
+          setPptFile(test_ppt);
+          setFileType("ppt");
         } else if (url === "test_svg") {
           setImageFile(test_svg);
           setFileType("image");
@@ -330,6 +342,12 @@ export default function App() {
         } else if (["pdf"].includes(tempFileType)) {
           setPdfFile(url);
           setFileType("pdf");
+        } else if (["doc"].includes(tempFileType)) {
+          setDocFile(url);
+          setFileType("doc");
+        } else if (["ppt"].includes(tempFileType)) {
+          setPptFile(url);
+          setFileType("ppt");
         } else if (["png", "svg", "jpg"].includes(tempFileType)) {
           setImageFile(url);
           setFileType("image");
@@ -385,6 +403,8 @@ export default function App() {
           { id: 11, value: "test_json", label: "Text (json)" },
           { id: 12, value: "test_mnf", label: "Text (mnf)" },
           { id: 13, value: "test_job", label: "Text (job)" },
+          { id: 14, value: "test_doc", label: "Word (docx)" },
+          { id: 15, value: "test_ppt", label: "PowerPoint (ppt)" },
         ]);
       } else await getDir(webDavPrefix + dir, 1, processXml);
       setWaitGetDir(false);
@@ -538,6 +558,19 @@ export default function App() {
         console.log("response", response);
       });
     };
+  // Iframe = (src) => {
+  //   console.log("src", src);
+  //   if (!src) {
+  //     return <div>Loading...</div>;
+  //   }
+  //   return (
+  //     // <div className="col-md-12">
+  //     //   <div className="emdeb-responsive">
+  //     <iframe src={src} title="doc-viewer"></iframe>
+  //     //   </div>
+  //     // </div>
+  //   );
+  // };
 
   useEffect(() => {
     window.addEventListener("resize", detectSize);
@@ -604,18 +637,18 @@ export default function App() {
     // eslint-disable-next-line
   }, [showPageBreaks]);
 
-  // console.log(
-  //   "fileType",
-  //   fileType,
-  //   "fileViewerType",
-  //   fileViewerType,
-  //   "fileDirectory",
-  //   fileDirectory,
-  // "content",
-  // content
-  //   "selectedFile",
-  //   selectedFile
-  // );
+  console.log(
+    "fileType",
+    fileType,
+    "fileViewerType",
+    fileViewerType,
+    "fileDirectory",
+    fileDirectory,
+    "selectedFile",
+    selectedFile,
+    "docFile",
+    docFile
+  );
 
   return (
     <Box>
@@ -984,6 +1017,22 @@ export default function App() {
                 />
                 {/* <Page pageNumber={pageNumber} /> */}
               </Document>
+            ) : ["doc"].includes(fileType) ? (
+              <iframe
+                title="show-doc"
+                src={
+                  "http://localhost:3000/lsaf/filedownload/sdd%3A///general/biostat/tools/fileviewer/test.docx"
+                }
+              ></iframe>
+            ) : ["ppt"].includes(fileType) ? (
+              <DocViewer
+                pluginRenderers={[DocViewerRenderers]}
+                documents={[
+                  {
+                    uri: "http://localhost:3000/lsaf/filedownload/sdd%3A///general/biostat/tools/fileviewer/test.docx",
+                  },
+                ]}
+              ></DocViewer>
             ) : ["image", "png", "svg", "jpg"].includes(fileType) ? (
               <img
                 src={imageFile}
