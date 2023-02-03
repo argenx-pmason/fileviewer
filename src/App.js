@@ -33,9 +33,9 @@ import { LicenseInfo } from "@mui/x-data-grid-pro";
 import Select from "react-select";
 import { Document, Page } from "react-pdf/dist/esm/entry.webpack";
 import Highlight from "react-highlight";
+// import hljs from "highlight.js";
 import { read, utils } from "xlsx";
 import { xml2json } from "xml-js";
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 // shared functions
 import { getDir, xmlToJson } from "./utility";
 // CSS
@@ -46,7 +46,7 @@ import test_lst from "./test/test.lst";
 import test_txt from "./test/test.txt";
 import test_pdf from "./test/test.pdf";
 import test_doc from "./test/test.docx";
-import test_ppt from "./test/test.pptx";
+// import test_ppt from "./test/test.pptx";
 import test_xlsx from "./test/test.xlsx";
 import test1_xlsx from "./test/test1.xlsx";
 import test3_xlsx from "./test/test3.xlsx";
@@ -63,7 +63,8 @@ export default function App() {
   LicenseInfo.setLicenseKey(
     "5b931c69b031b808de26d5902e04c36fTz00Njk0NyxFPTE2ODg4MDI3MDM3MjAsUz1wcm8sTE09c3Vic2NyaXB0aW9uLEtWPTI="
   );
-  let pageNumber = 1;
+  let pageNumber = 1,
+    xmlMaxCol = 0;
   const urlPrefix = window.location.protocol + "//" + window.location.host,
     { href } = window.location,
     buttonBackground = "#e8e8e8",
@@ -95,7 +96,7 @@ export default function App() {
     [rows, setRows] = useState([null]),
     [cols, setCols] = useState(null),
     [pdfFile, setPdfFile] = useState(null),
-    [pptFile, setPptFile] = useState(null),
+    // [pptFile, setPptFile] = useState(null),
     [docFile, setDocFile] = useState(null),
     [imageFile, setImageFile] = useState(null),
     [fitHeight, setFitHeight] = useState(undefined),
@@ -149,6 +150,7 @@ export default function App() {
       fetch(file).then(function (response) {
         // console.log(response);
         response.text().then(function (text) {
+          console.log("ft", ft);
           setOriginalContent(text);
           const newText = analyse(text);
           setContent(newText);
@@ -157,6 +159,71 @@ export default function App() {
           setWaitGetDir(false);
         });
       });
+    },
+    processXmlFile = (file) => {
+      setWaitGetDir(true);
+      fetch(file).then(function (response) {
+        // console.log(response);
+        response.text().then(function (text) {
+          setOriginalContent(text);
+          const jsonText = xml2json(text, {
+              ignoreComment: true,
+              // alwaysChildren: true,
+              trim: true,
+              spaces: 3,
+            }),
+            json = JSON.parse(jsonText);
+          descend(json, 0);
+          processTempRows();
+          console.log("xmlRows", xmlRows);
+          setFileType("xml");
+          setWaitGetDir(false);
+        });
+      });
+    },
+    tempRows = [],
+    descend = (ob, level) => {
+      const next = level + 1;
+      // console.log(ob, level);
+      const keys = Object.keys(ob);
+      keys.forEach((k) => {
+        tempRows.push([level, k]);
+        if (typeof ob[k] === "object") descend(ob[k], level + 1);
+        else tempRows.push([next, ob[k]]);
+      });
+    },
+    [xmlRows, setXmlRows] = useState(null),
+    [xmlCols, setXmlCols] = useState(null),
+    processTempRows = () => {
+      // console.log("tempRows", tempRows);
+      // const tempRows2 = tempRows.slice(0, 22);
+      const max = tempRows.length - 1;
+      let currentRow = {};
+      xmlMaxCol = 0; // maximum column number in XML array
+      const tempXmlRows = [];
+      tempRows.forEach((tr, i) => {
+        const nextCol = i < max ? tempRows[i + 1][0] : 0,
+          thisCol = tr[0];
+        if (thisCol > xmlMaxCol) xmlMaxCol = thisCol;
+        // console.log(thisCol, nextCol, tr);
+        currentRow[thisCol] = tr[1];
+        // console.log(currentRow);
+        if (thisCol > nextCol) {
+          tempXmlRows.push({ id: i, ...currentRow }); // write current row
+          // prepare row by only keeping higher level keys than the next one
+          Object.keys(currentRow).forEach((k) => {
+            if (k > nextCol) delete currentRow[k];
+          });
+        }
+      });
+      // define columns for xmlRows table
+      const tempXmlCols = Array.from({ length: xmlMaxCol + 1 }, (_, i) => ({
+        field: String(i),
+        headerName: utils.encode_col(i),
+      }));
+      console.log("tempXmlCols", tempXmlCols);
+      setXmlCols(tempXmlCols);
+      setXmlRows(tempXmlRows);
     },
     [currentExcelResp, setCurrentExcelResp] = useState(null),
     processExcel = (resp, sheetNumber = 0) => {
@@ -186,75 +253,75 @@ export default function App() {
       setFileType("excel");
       // console.log(tempRows, tempCols);
     },
-    processMnf = () => {
-      const jsonText = xml2json(content, {
-          ignoreComment: true,
-          // alwaysChildren: true,
-          trim: true,
-          spaces: 3,
-        }),
-        json = JSON.parse(jsonText),
-        elements = json.elements[0].elements,
-        feedback = [];
-      console.log("elements", elements);
-      elements.forEach((element) => {
-        let chunk = "",
-          path = "",
-          file = "";
-        chunk += "<b><i>" + element.name + "</i></b> - ";
-        switch (element.name) {
-          case "inputs":
-          case "outputs":
-            chunk += element.elements.length + ` ${element.name}<br/>`;
-            element.elements.forEach((e) => {
-              if (e.name === "file") {
-                path =
-                  e.attributes && e.attributes.uri
-                    ? e.attributes.uri.slice(6)
-                    : null;
-                file = path ? path.split("?")[0].split("/").pop() : null;
-                chunk += file
-                  ? `<a href='${
-                      fileViewerPrefix + path
-                    }' target='_blank'>${file}</a><br/>`
-                  : null;
-              }
-            });
-            chunk += "<br/>";
-            break;
-          case "job":
-          case "lst":
-            path =
-              element.attributes && element.attributes.uri
-                ? element.attributes.uri.slice(6)
-                : null;
-            file = path ? path.split("?")[0].split("/").pop() : null;
-            chunk += file
-              ? `<a href='${
-                  fileViewerPrefix + path
-                }' target='_blank'>${file}</a><br/>`
-              : "";
-            break;
-          case "log":
-            path =
-              element.attributes && element.attributes.uri
-                ? element.attributes.uri.slice(6)
-                : null;
-            file = path ? path.split("?")[0].split("/").pop() : null;
-            chunk += file
-              ? `<a href='${
-                  logViewerPrefix + path
-                }' target='_blank'>${file}</a><br/>`
-              : "";
-            break;
-          default:
-        }
-        feedback.push(chunk + "<p/>");
-      });
-      const allFeedback = feedback.join("<br/>");
-      setFileType("html");
-      setContent(allFeedback);
-    },
+    // processMnf = () => {
+    //   const jsonText = xml2json(content, {
+    //       ignoreComment: true,
+    //       // alwaysChildren: true,
+    //       trim: true,
+    //       spaces: 3,
+    //     }),
+    //     json = JSON.parse(jsonText),
+    //     elements = json.elements[0].elements,
+    //     feedback = [];
+    //   console.log("elements", elements);
+    //   elements.forEach((element) => {
+    //     let chunk = "",
+    //       path = "",
+    //       file = "";
+    //     chunk += "<b><i>" + element.name + "</i></b> - ";
+    //     switch (element.name) {
+    //       case "inputs":
+    //       case "outputs":
+    //         chunk += element.elements.length + ` ${element.name}<br/>`;
+    //         element.elements.forEach((e) => {
+    //           if (e.name === "file") {
+    //             path =
+    //               e.attributes && e.attributes.uri
+    //                 ? e.attributes.uri.slice(6)
+    //                 : null;
+    //             file = path ? path.split("?")[0].split("/").pop() : null;
+    //             chunk += file
+    //               ? `<a href='${
+    //                   fileViewerPrefix + path
+    //                 }' target='_blank'>${file}</a><br/>`
+    //               : null;
+    //           }
+    //         });
+    //         chunk += "<br/>";
+    //         break;
+    //       case "job":
+    //       case "lst":
+    //         path =
+    //           element.attributes && element.attributes.uri
+    //             ? element.attributes.uri.slice(6)
+    //             : null;
+    //         file = path ? path.split("?")[0].split("/").pop() : null;
+    //         chunk += file
+    //           ? `<a href='${
+    //               fileViewerPrefix + path
+    //             }' target='_blank'>${file}</a><br/>`
+    //           : "";
+    //         break;
+    //       case "log":
+    //         path =
+    //           element.attributes && element.attributes.uri
+    //             ? element.attributes.uri.slice(6)
+    //             : null;
+    //         file = path ? path.split("?")[0].split("/").pop() : null;
+    //         chunk += file
+    //           ? `<a href='${
+    //               logViewerPrefix + path
+    //             }' target='_blank'>${file}</a><br/>`
+    //           : "";
+    //         break;
+    //       default:
+    //     }
+    //     feedback.push(chunk + "<p/>");
+    //   });
+    //   const allFeedback = feedback.join("<br/>");
+    //   setFileType("html");
+    //   setContent(allFeedback);
+    // },
     getFile = (url) => {
       // console.log(url);
       // local mode for test and development
@@ -262,8 +329,8 @@ export default function App() {
         if (url === "test_lst") processText(test_lst, "txt");
         else if (url === "test_txt") processText(test_txt, "txt");
         else if (url === "test_sas") processText(test_sas, "sas");
-        else if (url === "test_job") processText(test_job, "xml");
-        else if (url === "test_mnf") processText(test_mnf, "xml");
+        else if (url === "test_job") processXmlFile(test_job);
+        else if (url === "test_mnf") processXmlFile(test_mnf);
         else if (url === "test_json") processText(test_json, "json");
         else if (url === "test_xlsx") {
           fetch(test_xlsx).then((response) => {
@@ -298,9 +365,9 @@ export default function App() {
         } else if (url === "test_doc") {
           setDocFile(test_doc);
           setFileType("doc");
-        } else if (url === "test_ppt") {
-          setPptFile(test_ppt);
-          setFileType("ppt");
+          // } else if (url === "test_ppt") {
+          //   setPptFile(test_ppt);
+          //   setFileType("ppt");
         } else if (url === "test_svg") {
           setImageFile(test_svg);
           setFileType("image");
@@ -327,7 +394,7 @@ export default function App() {
           tempFileType = splitDots.pop(),
           isDirectory = [0, 1].includes(splitDots.length);
         // setFileType(tempFileType);
-        // console.log("tempFileType", tempFileType, "url", url);
+        console.log("tempFileType", tempFileType, "url", url, isDirectory);
         if (["xlsx", "csv"].includes(tempFileType)) {
           setWaitGetDir(true);
           // setFileType("excel");
@@ -342,24 +409,26 @@ export default function App() {
         } else if (["pdf"].includes(tempFileType)) {
           setPdfFile(url);
           setFileType("pdf");
+        } else if (["job", "mnf"].includes(tempFileType)) {
+          setWaitGetDir(true);
+          setFileType("xml");
+          fetch(url).then((response) => {
+            response.arrayBuffer().then((resp) => {
+              // console.log("resp", resp);
+              processXml(resp);
+              setWaitGetDir(false);
+            });
+          });
         } else if (["doc"].includes(tempFileType)) {
           setDocFile(url);
           setFileType("doc");
-        } else if (["ppt"].includes(tempFileType)) {
-          setPptFile(url);
-          setFileType("ppt");
+          // } else if (["ppt"].includes(tempFileType)) {
+          //   setPptFile(url);
+          //   setFileType("ppt");
         } else if (["png", "svg", "jpg"].includes(tempFileType)) {
           setImageFile(url);
           setFileType("image");
         } else {
-          // console.log(
-          //   "tempFileType",
-          //   tempFileType,
-          //   "splitDots",
-          //   splitDots,
-          //   "isDirectory",
-          //   isDirectory
-          // );
           if (splitDots.length > 0) {
             setWaitGetDir(true);
             // process file depending on file type
@@ -369,15 +438,7 @@ export default function App() {
                 const newText = analyse(text);
                 setContent(newText);
                 setFileType("txt");
-                // choose the file viewer type to use for text files, if the suffix is unusual
-                switch (tempFileType) {
-                  case "mnf":
-                  case "job":
-                    setFileViewerType("xml");
-                    break;
-                  default:
-                    setFileViewerType(tempFileType);
-                }
+                setFileViewerType(tempFileType);
                 setWaitGetDir(false);
               });
             });
@@ -404,7 +465,7 @@ export default function App() {
           { id: 12, value: "test_mnf", label: "Text (mnf)" },
           { id: 13, value: "test_job", label: "Text (job)" },
           { id: 14, value: "test_doc", label: "Word (docx)" },
-          { id: 15, value: "test_ppt", label: "PowerPoint (ppt)" },
+          // { id: 15, value: "test_ppt", label: "PowerPoint (ppt)" },
         ]);
       } else await getDir(webDavPrefix + dir, 1, processXml);
       setWaitGetDir(false);
@@ -834,18 +895,6 @@ export default function App() {
                     </IconButton>
                   </Tooltip>
                 )}
-                {fileViewerType === "xml" && (
-                  <Tooltip title="Process and show links from XML">
-                    <IconButton
-                      onClick={() => {
-                        processMnf();
-                      }}
-                      sx={{ backgroundColor: buttonBackground }}
-                    >
-                      <Link />
-                    </IconButton>
-                  </Tooltip>
-                )}
                 <Tooltip title="Experiment">
                   <IconButton
                     onClick={() => {
@@ -1005,6 +1054,18 @@ export default function App() {
                   fontSize: "0.8em",
                 }}
               />
+            ) : ["xml"].includes(fileType) &&
+              xmlRows.length > 0 &&
+              xmlCols.length > 0 ? (
+              <DataGridPro
+                rows={xmlRows}
+                columns={xmlCols}
+                density="compact"
+                rowHeight={30}
+                sx={{
+                  fontSize: "0.8em",
+                }}
+              />
             ) : ["pdf"].includes(fileType) ? (
               <Document file={pdfFile} page={page}>
                 <Page
@@ -1018,22 +1079,15 @@ export default function App() {
                 {/* <Page pageNumber={pageNumber} /> */}
               </Document>
             ) : ["doc"].includes(fileType) ? (
-              <iframe
-                title="show-doc"
-                src={
-                  "http://localhost:3000/lsaf/filedownload/sdd%3A///general/biostat/tools/fileviewer/test.docx"
-                }
-              ></iframe>
-            ) : ["ppt"].includes(fileType) ? (
-              <DocViewer
-                pluginRenderers={[DocViewerRenderers]}
-                documents={[
-                  {
-                    uri: "http://localhost:3000/lsaf/filedownload/sdd%3A///general/biostat/tools/fileviewer/test.docx",
-                  },
-                ]}
-              ></DocViewer>
-            ) : ["image", "png", "svg", "jpg"].includes(fileType) ? (
+              <p>Under Development</p>
+            ) : // ${decodeURIComponent(https://go.microsoft.com/fwlink/?LinkID=521962)
+            // url="https://go.microsoft.com/fwlink/?LinkID=521962"
+            // url="https://xarprod.ondemand.sas.com/lsaf/webdav/repo/general/biostat/tools/fileviewer/test/test.docx"
+            // url="http://localhost:3000/lsaf/filedownload/sdd%3A///general/biostat/tools/fileviewer/pptx.docx"
+
+            // url={test_doc}
+
+            [("image", "png", "svg", "jpg")].includes(fileType) ? (
               <img
                 src={imageFile}
                 width={
