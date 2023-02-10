@@ -233,7 +233,6 @@ export default function App() {
     //     // handle absolute paths
     //     window.open(fileViewerPrefix + value, "_blank");
     //   }
-    //   // TODO: handle multiple ../../../
     //   if (value.startsWith("../")) {
     //     // handle relative paths
     //     const prefix0 = fileDirectory.split("/");
@@ -352,7 +351,6 @@ export default function App() {
         if (url === "test_lst") processText(test_lst, "txt");
         else if (url === "test_txt") processText(test_txt, "txt");
         else if (url === "test_sas") processText(test_sas, "sas");
-        //TODO: add suport for job/manifest back in
         // else if (url === "test_job") processXmlFile(test_job);
         // else if (url === "test_mnf") processXmlFile(test_mnf);
         else if (url === "test_job") processText(test_job, "xml");
