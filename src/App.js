@@ -35,7 +35,7 @@ import { Document, Page } from "react-pdf/dist/esm/entry.webpack";
 import Highlight from "react-highlight";
 // import hljs from "highlight.js";
 import { read, utils } from "xlsx";
-import { xml2json } from "xml-js";
+// import { xml2json } from "xml-js";
 // shared functions
 import { getDir, xmlToJson } from "./utility";
 // CSS
@@ -63,12 +63,12 @@ export default function App() {
   LicenseInfo.setLicenseKey(
     "5b931c69b031b808de26d5902e04c36fTz00Njk0NyxFPTE2ODg4MDI3MDM3MjAsUz1wcm8sTE09c3Vic2NyaXB0aW9uLEtWPTI="
   );
-  let pageNumber = 1,
-    xmlMaxCol = 0;
+  let pageNumber = 1;
+  // xmlMaxCol = 0;
   const urlPrefix = window.location.protocol + "//" + window.location.host,
     { href } = window.location,
-    buttonBackground = "#e8e8e8",
     mode = href.startsWith("http://localhost") ? "local" : "remote",
+    buttonBackground = "#e8e8e8",
     fileRef = createRef(),
     [windowDimension, detectHW] = useState({
       winWidth: window.innerWidth,
@@ -160,71 +160,94 @@ export default function App() {
         });
       });
     },
-    processXmlFile = (file) => {
-      setWaitGetDir(true);
-      fetch(file).then(function (response) {
-        // console.log(response);
-        response.text().then(function (text) {
-          setOriginalContent(text);
-          const jsonText = xml2json(text, {
-              ignoreComment: true,
-              // alwaysChildren: true,
-              trim: true,
-              spaces: 3,
-            }),
-            json = JSON.parse(jsonText);
-          descend(json, 0);
-          processTempRows();
-          console.log("xmlRows", xmlRows);
-          setFileType("xml");
-          setWaitGetDir(false);
-        });
-      });
-    },
-    tempRows = [],
-    descend = (ob, level) => {
-      const next = level + 1;
-      // console.log(ob, level);
-      const keys = Object.keys(ob);
-      keys.forEach((k) => {
-        tempRows.push([level, k]);
-        if (typeof ob[k] === "object") descend(ob[k], level + 1);
-        else tempRows.push([next, ob[k]]);
-      });
-    },
-    [xmlRows, setXmlRows] = useState(null),
-    [xmlCols, setXmlCols] = useState(null),
-    processTempRows = () => {
-      // console.log("tempRows", tempRows);
-      // const tempRows2 = tempRows.slice(0, 22);
-      const max = tempRows.length - 1;
-      let currentRow = {};
-      xmlMaxCol = 0; // maximum column number in XML array
-      const tempXmlRows = [];
-      tempRows.forEach((tr, i) => {
-        const nextCol = i < max ? tempRows[i + 1][0] : 0,
-          thisCol = tr[0];
-        if (thisCol > xmlMaxCol) xmlMaxCol = thisCol;
-        // console.log(thisCol, nextCol, tr);
-        currentRow[thisCol] = tr[1];
-        // console.log(currentRow);
-        if (thisCol > nextCol) {
-          tempXmlRows.push({ id: i, ...currentRow }); // write current row
-          // prepare row by only keeping higher level keys than the next one
-          Object.keys(currentRow).forEach((k) => {
-            if (k > nextCol) delete currentRow[k];
-          });
-        }
-      });
-      // define columns for xmlRows table
-      const tempXmlCols = Array.from({ length: xmlMaxCol + 1 }, (_, i) => ({
-        field: String(i),
-        headerName: utils.encode_col(i),
-      }));
-      console.log("tempXmlCols", tempXmlCols);
-      setXmlCols(tempXmlCols);
-      setXmlRows(tempXmlRows);
-    },
+    // processXmlFile = (file) => {
+    //   setWaitGetDir(true);
+    //   fetch(file).then(function (response) {
+    //     // console.log(response);
+    //     response.text().then(function (text) {
+    //       setOriginalContent(text);
+    //       const jsonText = xml2json(text, {
+    //           ignoreComment: true,
+    //           // alwaysChildren: true,
+    //           trim: true,
+    //           spaces: 3,
+    //         }),
+    //         json = JSON.parse(jsonText);
+    //       descend(json, 0);
+    //       processTempRows();
+    //       console.log("xmlRows", xmlRows);
+    //       setFileType("xml");
+    //       setWaitGetDir(false);
+    //     });
+    //   });
+    // },
+    // tempRows = [],
+    // descend = (ob, level) => {
+    //   const next = level + 1;
+    //   // console.log(ob, level);
+    //   const keys = Object.keys(ob);
+    //   keys.forEach((k) => {
+    //     tempRows.push([level, k]);
+    //     if (typeof ob[k] === "object") descend(ob[k], level + 1);
+    //     else tempRows.push([next, ob[k]]);
+    //   });
+    // },
+    // [xmlRows, setXmlRows] = useState(null),
+    // [xmlCols, setXmlCols] = useState(null),
+    // processTempRows = () => {
+    //   // console.log("tempRows", tempRows);
+    //   // const tempRows2 = tempRows.slice(0, 22);
+    //   const max = tempRows.length - 1;
+    //   let currentRow = {};
+    //   xmlMaxCol = 0; // maximum column number in XML array
+    //   const tempXmlRows = [];
+    //   tempRows.forEach((tr, i) => {
+    //     const nextCol = i < max ? tempRows[i + 1][0] : 0,
+    //       thisCol = tr[0];
+    //     if (thisCol > xmlMaxCol) xmlMaxCol = thisCol;
+    //     // console.log(thisCol, nextCol, tr);
+    //     currentRow[thisCol] = tr[1];
+    //     // console.log(currentRow);
+    //     if (thisCol > nextCol) {
+    //       tempXmlRows.push({ id: i, ...currentRow }); // write current row
+    //       // prepare row by only keeping higher level keys than the next one
+    //       Object.keys(currentRow).forEach((k) => {
+    //         if (k > nextCol) delete currentRow[k];
+    //       });
+    //     }
+    //   });
+    //   // define columns for xmlRows table
+    //   const tempXmlCols = Array.from({ length: xmlMaxCol + 1 }, (_, i) => ({
+    //     field: String(i),
+    //     headerName: utils.encode_col(i),
+    //   }));
+    //   console.log("tempXmlCols", tempXmlCols);
+    //   setXmlCols(tempXmlCols);
+    //   setXmlRows(tempXmlRows);
+    // },
+    // handleXmlClick = (params) => {
+    //   const { value } = params;
+    //   console.log(value, "fileDirectory", fileDirectory);
+    //   // check if value looks like it could be used to view a file
+    //   if (value.startsWith("/")) {
+    //     // handle absolute paths
+    //     window.open(fileViewerPrefix + value, "_blank");
+    //   }
+    //   // TODO: handle multiple ../../../
+    //   if (value.startsWith("../")) {
+    //     // handle relative paths
+    //     const prefix0 = fileDirectory.split("/");
+    //     prefix0.pop();
+    //     const prefix = prefix0.join("/");
+    //     window.open(fileViewerPrefix + prefix + value.substring(2), "_blank");
+    //   }
+    //   if (value.startsWith("./")) {
+    //     window.open(
+    //       fileViewerPrefix + fileDirectory + value.substring(1),
+    //       "_blank"
+    //     );
+    //   }
+    // },
     [currentExcelResp, setCurrentExcelResp] = useState(null),
     processExcel = (resp, sheetNumber = 0) => {
       setCurrentExcelResp(resp);
@@ -329,8 +352,11 @@ export default function App() {
         if (url === "test_lst") processText(test_lst, "txt");
         else if (url === "test_txt") processText(test_txt, "txt");
         else if (url === "test_sas") processText(test_sas, "sas");
-        else if (url === "test_job") processXmlFile(test_job);
-        else if (url === "test_mnf") processXmlFile(test_mnf);
+        //TODO: add suport for job/manifest back in
+        // else if (url === "test_job") processXmlFile(test_job);
+        // else if (url === "test_mnf") processXmlFile(test_mnf);
+        else if (url === "test_job") processText(test_job, "xml");
+        else if (url === "test_mnf") processText(test_mnf, "xml");
         else if (url === "test_json") processText(test_json, "json");
         else if (url === "test_xlsx") {
           fetch(test_xlsx).then((response) => {
@@ -409,16 +435,8 @@ export default function App() {
         } else if (["pdf"].includes(tempFileType)) {
           setPdfFile(url);
           setFileType("pdf");
-        } else if (["job", "mnf"].includes(tempFileType)) {
-          setWaitGetDir(true);
-          setFileType("xml");
-          fetch(url).then((response) => {
-            response.arrayBuffer().then((resp) => {
-              // console.log("resp", resp);
-              processXml(resp);
-              setWaitGetDir(false);
-            });
-          });
+          // } else if (["job", "mnf"].includes(tempFileType)) {
+          //   processXmlFile(url);
         } else if (["doc"].includes(tempFileType)) {
           setDocFile(url);
           setFileType("doc");
@@ -658,7 +676,10 @@ export default function App() {
       getFile(file);
       setFileName(tempFileName);
       setFileType(tempFileType);
-      setFileViewerType(tempFileType);
+      console.log(tempFileName, tempFileType);
+      setFileViewerType(
+        ["job", "mnf"].includes(tempFileType) ? "xml" : tempFileType
+      );
       // set the directory to that of the file which was passed in
       const fileDirBits = file.split("%3A")[1].split("?")[0].split("/");
       fileDirBits.pop();
@@ -1043,23 +1064,37 @@ export default function App() {
               height: windowDimension.winHeight - topSpace,
               overflow: "auto",
             }}
+            onClick={(e) => {
+              const value = e.target.innerHTML.slice(1, -1);
+              console.log(value);
+              if (value.startsWith("/")) {
+                // handle absolute paths
+                window.open(fileViewerPrefix + value, "_blank");
+              }
+              if (value.startsWith("../")) {
+                // handle relative paths
+                const prefix0 = fileDirectory.split("/");
+                prefix0.pop();
+                const prefix = prefix0.join("/");
+                window.open(
+                  fileViewerPrefix + prefix + value.substring(2),
+                  "_blank"
+                );
+              }
+              if (value.startsWith("./")) {
+                window.open(
+                  fileViewerPrefix + fileDirectory + value.substring(1),
+                  "_blank"
+                );
+              }
+              if (value.startsWith("sdd:///"))
+                window.open(fileViewerPrefix + value.substring(6), "_blank");
+            }}
           >
             {["excel", "xlsx", "csv"].includes(fileType) && rows && cols ? (
               <DataGridPro
                 rows={rows}
                 columns={cols}
-                density="compact"
-                rowHeight={30}
-                sx={{
-                  fontSize: "0.8em",
-                }}
-              />
-            ) : ["xml"].includes(fileType) &&
-              xmlRows.length > 0 &&
-              xmlCols.length > 0 ? (
-              <DataGridPro
-                rows={xmlRows}
-                columns={xmlCols}
                 density="compact"
                 rowHeight={30}
                 sx={{
