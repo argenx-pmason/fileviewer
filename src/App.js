@@ -21,7 +21,7 @@ import {
   ZoomOut,
   ZoomIn,
   Height,
-  Link,
+  // Link,
   ArrowDropDown,
   ArrowDropUp,
   ArrowCircleUp,
@@ -45,7 +45,7 @@ import "./App.css";
 import test_lst from "./test/test.lst";
 import test_txt from "./test/test.txt";
 import test_pdf from "./test/test.pdf";
-import test_doc from "./test/test.docx";
+// import test_doc from "./test/test.docx";
 // import test_ppt from "./test/test.pptx";
 import test_xlsx from "./test/test.xlsx";
 import test1_xlsx from "./test/test1.xlsx";
@@ -97,7 +97,7 @@ export default function App() {
     [cols, setCols] = useState(null),
     [pdfFile, setPdfFile] = useState(null),
     // [pptFile, setPptFile] = useState(null),
-    [docFile, setDocFile] = useState(null),
+    // [docFile, setDocFile] = useState(null),
     [imageFile, setImageFile] = useState(null),
     [fitHeight, setFitHeight] = useState(undefined),
     [page] = useState(1),
@@ -386,9 +386,9 @@ export default function App() {
         } else if (url === "test_pdf") {
           setPdfFile(test_pdf);
           setFileType("pdf");
-        } else if (url === "test_doc") {
-          setDocFile(test_doc);
-          setFileType("doc");
+          // } else if (url === "test_doc") {
+          //   setDocFile(test_doc);
+          //   setFileType("doc");
           // } else if (url === "test_ppt") {
           //   setPptFile(test_ppt);
           //   setFileType("ppt");
@@ -435,9 +435,9 @@ export default function App() {
           setFileType("pdf");
           // } else if (["job", "mnf"].includes(tempFileType)) {
           //   processXmlFile(url);
-        } else if (["doc"].includes(tempFileType)) {
-          setDocFile(url);
-          setFileType("doc");
+          // } else if (["doc"].includes(tempFileType)) {
+          //   setDocFile(url);
+          //   setFileType("doc");
           // } else if (["ppt"].includes(tempFileType)) {
           //   setPptFile(url);
           //   setFileType("ppt");
@@ -610,31 +610,31 @@ export default function App() {
       // console.log("chunk", chunk);
       setOriginalContent(chunk);
       setContent(chunk);
-    },
-    experimentOptions = {
-      method: "put",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": "41d6dd33-cfa1-4a6d-9cfc-77e821ce6ec1",
-      },
-      body: JSON.stringify({
-        path: "/general/biostat/gadam/documents/gadam_dshb/adam_msg.sas7bdat",
-        location: "REPOSITORY",
-        version: null,
-        refresh: true,
-        includeInfo: true,
-        start: 0,
-        limit: 1000,
-      }),
-    },
-    experiment = () => {
-      fetch(
-        "https://xarprod.ondemand.sas.com/lsaf/rest/dataview/278b7216-e082-4452-9c20-e85fa1298a19/data",
-        experimentOptions
-      ).then((response) => {
-        console.log("response", response);
-      });
     };
+  // experimentOptions = {
+  //   method: "put",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     "X-CSRF-TOKEN": "41d6dd33-cfa1-4a6d-9cfc-77e821ce6ec1",
+  //   },
+  //   body: JSON.stringify({
+  //     path: "/general/biostat/gadam/documents/gadam_dshb/adam_msg.sas7bdat",
+  //     location: "REPOSITORY",
+  //     version: null,
+  //     refresh: true,
+  //     includeInfo: true,
+  //     start: 0,
+  //     limit: 1000,
+  //   }),
+  // };
+  // experiment = () => {
+  //   fetch(
+  //     "https://xarprod.ondemand.sas.com/lsaf/rest/dataview/278b7216-e082-4452-9c20-e85fa1298a19/data",
+  //     experimentOptions
+  //   ).then((response) => {
+  //     console.log("response", response);
+  //   });
+  // };
   // Iframe = (src) => {
   //   console.log("src", src);
   //   if (!src) {
@@ -717,18 +717,18 @@ export default function App() {
     // eslint-disable-next-line
   }, [showPageBreaks]);
 
-  console.log(
-    "fileType",
-    fileType,
-    "fileViewerType",
-    fileViewerType,
-    "fileDirectory",
-    fileDirectory,
-    "selectedFile",
-    selectedFile,
-    "docFile",
-    docFile
-  );
+  // console.log(
+  //   "fileType",
+  //   fileType,
+  //   "fileViewerType",
+  //   fileViewerType,
+  //   "fileDirectory",
+  //   fileDirectory,
+  //   "selectedFile",
+  //   selectedFile,
+  //   "docFile",
+  //   docFile
+  // );
 
   return (
     <Box>
@@ -914,7 +914,7 @@ export default function App() {
                     </IconButton>
                   </Tooltip>
                 )}
-                <Tooltip title="Experiment">
+                {/* <Tooltip title="Experiment">
                   <IconButton
                     onClick={() => {
                       experiment();
@@ -923,7 +923,7 @@ export default function App() {
                   >
                     <Link />
                   </IconButton>
-                </Tooltip>
+                </Tooltip> */}
               </Box>
             </Grid>
             <Grid item xs={7}>
@@ -1003,6 +1003,7 @@ export default function App() {
                           "_blank"
                         );
                       }}
+                      sx={{ ml: 3 }}
                     >
                       View
                     </Button>
@@ -1111,16 +1112,7 @@ export default function App() {
                 />
                 {/* <Page pageNumber={pageNumber} /> */}
               </Document>
-            ) : ["doc"].includes(fileType) ? (
-              <p>Under Development</p>
-            ) : // ${decodeURIComponent(https://go.microsoft.com/fwlink/?LinkID=521962)
-            // url="https://go.microsoft.com/fwlink/?LinkID=521962"
-            // url="https://xarprod.ondemand.sas.com/lsaf/webdav/repo/general/biostat/tools/fileviewer/test/test.docx"
-            // url="http://localhost:3000/lsaf/filedownload/sdd%3A///general/biostat/tools/fileviewer/pptx.docx"
-
-            // url={test_doc}
-
-            [("image", "png", "svg", "jpg")].includes(fileType) ? (
+            ) : ["image", "png", "svg", "jpg"].includes(fileType) ? (
               <img
                 src={imageFile}
                 width={
