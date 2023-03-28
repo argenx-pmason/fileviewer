@@ -4,6 +4,9 @@ import {
   Box,
   Tooltip,
   IconButton,
+  AppBar,
+  // Container,
+  Toolbar,
   Typography,
   TextField,
   Button,
@@ -25,6 +28,8 @@ import {
   ArrowDropDown,
   ArrowDropUp,
   ArrowCircleUp,
+  Compress,
+  Expand,
 } from "@mui/icons-material";
 // import {DataGrid } from "@mui/x-data-grid";
 import { DataGridPro } from "@mui/x-data-grid-pro";
@@ -64,11 +69,14 @@ export default function App() {
     "5b931c69b031b808de26d5902e04c36fTz00Njk0NyxFPTE2ODg4MDI3MDM3MjAsUz1wcm8sTE09c3Vic2NyaXB0aW9uLEtWPTI="
   );
   let pageNumber = 1;
+
   // xmlMaxCol = 0;
   const urlPrefix = window.location.protocol + "//" + window.location.host,
     { href } = window.location,
     mode = href.startsWith("http://localhost") ? "local" : "remote",
+    server = href.split("//")[1].split("/")[0],
     buttonBackground = "#e8e8e8",
+    increment = 20, // pixels to change height of content by
     fileRef = createRef(),
     [windowDimension, detectHW] = useState({
       winWidth: window.innerWidth,
@@ -84,7 +92,7 @@ export default function App() {
       });
     },
     [fontSize, setFontSize] = useState(12),
-    topSpace = 160,
+    iconPadding = 0.1,
     [imageDelta, setImageDelta] = useState(0),
     [content, setContent] = useState(null),
     // [options] = useState(null),
@@ -108,10 +116,8 @@ export default function App() {
     [selectedSheet, setSelectedSheet] = useState(null),
     [sheetOptions, setSheetOptions] = useState(null),
     [showSheetSelector, setShowSheetSelector] = useState(null),
-    logViewerPrefix =
-      "https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd:/general/biostat/tools/logviewer/index.html?log=",
-    fileViewerPrefix =
-      "https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd:/general/biostat/tools/fileviewer/index.html?file=",
+    logViewerPrefix = `https://${server}/lsaf/filedownload/sdd:/general/biostat/tools/logviewer/index.html?log=`,
+    fileViewerPrefix = `https://${server}/lsaf/filedownload/sdd:/general/biostat/tools/fileviewer/index.html?file=`,
     // officeFileViewerPrefix =
     //   "https://view.officeapps.live.com/op/view.aspx?src=",
     // user selects file from list of files loaded from directory
@@ -247,6 +253,7 @@ export default function App() {
     //     );
     //   }
     // },
+    [topSpace, setTopSpace] = useState(160),
     [currentExcelResp, setCurrentExcelResp] = useState(null),
     processExcel = (resp, sheetNumber = 0) => {
       setCurrentExcelResp(resp);
@@ -418,7 +425,7 @@ export default function App() {
           tempFileType = splitDots.pop(),
           isDirectory = [0, 1].includes(splitDots.length);
         // setFileType(tempFileType);
-        console.log("tempFileType", tempFileType, "url", url, isDirectory);
+        // console.log("tempFileType", tempFileType, "url", url, isDirectory);
         if (["xlsx", "csv"].includes(tempFileType)) {
           setWaitGetDir(true);
           // setFileType("excel");
@@ -649,6 +656,8 @@ export default function App() {
   //   );
   // };
 
+  // console.log("href", href, "server", server);
+
   useEffect(() => {
     window.addEventListener("resize", detectSize);
     return () => {
@@ -674,18 +683,41 @@ export default function App() {
       getFile(file);
       setFileName(tempFileName);
       setFileType(tempFileType);
-      console.log(tempFileName, tempFileType);
+      // console.log(tempFileName, tempFileType);
       setFileViewerType(
         ["job", "mnf"].includes(tempFileType) ? "xml" : tempFileType
       );
       // set the directory to that of the file which was passed in
-      const fileDirBits = file.split("%3A")[1].split("?")[0].split("/");
+      const fileSplit = file.split("%3A");
+      // console.log("fileSplit", fileSplit);
+      const fileDirBits =
+        fileSplit.length > 1
+          ? fileSplit[1].split("?")[0].split("/")
+          : fileSplit[0].split("/");
       fileDirBits.pop();
       const tempFileDir = fileDirBits.filter((element) => element),
         fileDir = tempFileDir.join("/");
       // console.log("fileDir", fileDir);
       // Assumption: if filename has a . then it is a file, but if not it is a directory
       // console.log(tempFileName.split(".").length);
+
+      // look for lsaf/webdav/repo and then use substring to just get the path within lsaf from /general or /clinical
+      const ind = file.indexOf("lsaf/webdav/repo");
+      let tf = tempFileName;
+      if (ind > 0) tf = tempFileName.substring(ind + 17);
+      // console.log(
+      //   "file",
+      //   file,
+      //   "partialFile",
+      //   partialFile,
+      //   "urlPrefix",
+      //   urlPrefix,
+      //   "filePrefix",
+      //   filePrefix,
+      //   "tf",
+      //   tf
+      // );
+
       if (tempFileName.split(".").length > 1) setFileDirectory("/" + fileDir);
       else {
         if (partialFile.substring(0, 1) !== "/") {
@@ -697,7 +729,7 @@ export default function App() {
         }
       }
     } else {
-      console.log(mode, fileDirectory);
+      // console.log(mode, fileDirectory);
       getWebDav(fileDirectory);
       // fetch(test_lst)
       //   .then((r) => r.text())
@@ -732,210 +764,291 @@ export default function App() {
 
   return (
     <Box>
-      <Grid container spacing={2}>
+      <Grid container>
         {
           <>
-            <Grid item xs={5}>
-              <Box
-                variant={"dense"}
-                sx={{
-                  bgcolor: "background.paper",
-                  color: "text.secondary",
-                }}
-              >
-                <Tooltip title="Reduce size of font">
-                  <IconButton
-                    onClick={() => {
-                      setFontSize(fontSize - 1);
-                    }}
-                    sx={{ backgroundColor: buttonBackground }}
-                  >
-                    <Remove />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Reset to 12">
-                  <IconButton
-                    onClick={() => {
-                      setFontSize(12);
-                    }}
-                    sx={{ backgroundColor: buttonBackground }}
-                  >
-                    <RestartAlt />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Increase size of font">
-                  <IconButton
-                    onClick={() => {
-                      setFontSize(fontSize + 1);
-                    }}
-                    sx={{ backgroundColor: buttonBackground }}
-                  >
-                    <Add />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Download File">
-                  <IconButton
-                    onClick={() => {
-                      downloadFile(url, fileName);
-                    }}
-                    sx={{ backgroundColor: buttonBackground }}
-                  >
-                    <Download />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Open in new tab">
-                  <IconButton
-                    onClick={() => {
-                      openInNewTab(`${url}`);
-                    }}
-                    sx={{ backgroundColor: buttonBackground }}
-                  >
-                    <FolderOpen />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Copy content">
-                  <IconButton
-                    onClick={() => {
-                      navigator.clipboard.writeText(content);
-                    }}
-                    sx={{ backgroundColor: buttonBackground }}
-                  >
-                    <ContentCopy />
-                  </IconButton>
-                </Tooltip>
-                {listOfFiles && listOfFiles.length > 0 && (
-                  <Tooltip title="Show previous file">
-                    <IconButton
-                      onClick={() => {
-                        const id = selectedFile ? selectedFile.id : 1,
-                          newId = id === 0 ? id : id - 1;
-                        // console.log(listOfFiles, selectedFile, id, newId);
-                        if (id !== newId) selectFile(listOfFiles[newId]);
+            <AppBar
+              position="static"
+              sx={{
+                bgcolor: "background.paper",
+                color: "text.secondary",
+                m: 0,
+              }}
+            >
+              {/* <Container> */}
+              <Toolbar disableGutters variant="dense" sx={{ m: 0.5 }}>
+                <Grid item>
+                  {/* <Box
+                      variant={"dense"}
+                      sx={{
+                        bgcolor: "background.paper",
+                        color: "text.secondary",
                       }}
-                      sx={{ backgroundColor: buttonBackground }}
+                    > */}
+                  <Tooltip title="Reduce size of font">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        setFontSize(fontSize - 1);
+                      }}
+                      sx={{
+                        backgroundColor: buttonBackground,
+                        padding: iconPadding,
+                      }}
                     >
-                      <ArrowDropUp />
+                      <Remove fontSize="small" />
                     </IconButton>
                   </Tooltip>
-                )}
-                {listOfFiles && listOfFiles.length > 0 && (
-                  <Tooltip title="Show next file">
+                  <Tooltip title="Reset to 12">
                     <IconButton
+                      size="small"
                       onClick={() => {
-                        const id = selectedFile ? selectedFile.id : -1,
-                          length = listOfFiles.length,
-                          newId = id === length - 1 ? id : id + 1;
-                        // console.log(listOfFiles, selectedFile, id, newId, length);
-                        if (id !== newId) selectFile(listOfFiles[newId]);
+                        setFontSize(12);
                       }}
-                      sx={{ backgroundColor: buttonBackground }}
+                      sx={{
+                        backgroundColor: buttonBackground,
+                        padding: iconPadding,
+                      }}
                     >
-                      <ArrowDropDown />
+                      <RestartAlt fontSize="small" />
                     </IconButton>
                   </Tooltip>
-                )}
-                {fileType === "txt" && (
-                  <Tooltip title="Show Page Breaks (plain text files)">
+                  <Tooltip title="Increase size of font">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        setFontSize(fontSize + 1);
+                      }}
+                      sx={{
+                        backgroundColor: buttonBackground,
+                        padding: iconPadding,
+                      }}
+                    >
+                      <Add fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Download File">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        downloadFile(url, fileName);
+                      }}
+                      sx={{
+                        backgroundColor: buttonBackground,
+                        padding: iconPadding,
+                      }}
+                    >
+                      <Download fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Open in new tab">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        openInNewTab(`${url}`);
+                      }}
+                      sx={{
+                        backgroundColor: buttonBackground,
+                        padding: iconPadding,
+                      }}
+                    >
+                      <FolderOpen fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Copy content">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        navigator.clipboard.writeText(content);
+                      }}
+                      sx={{
+                        backgroundColor: buttonBackground,
+                        padding: iconPadding,
+                      }}
+                    >
+                      <ContentCopy fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  {listOfFiles && listOfFiles.length > 0 && (
+                    <Tooltip title="Show previous file">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          const id = selectedFile ? selectedFile.id : 1,
+                            newId = id === 0 ? id : id - 1;
+                          // console.log(listOfFiles, selectedFile, id, newId);
+                          if (id !== newId) selectFile(listOfFiles[newId]);
+                        }}
+                        sx={{
+                          backgroundColor: buttonBackground,
+                          padding: iconPadding,
+                        }}
+                      >
+                        <ArrowDropUp fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {listOfFiles && listOfFiles.length > 0 && (
+                    <Tooltip title="Show next file">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          const id = selectedFile ? selectedFile.id : -1,
+                            length = listOfFiles.length,
+                            newId = id === length - 1 ? id : id + 1;
+                          // console.log(listOfFiles, selectedFile, id, newId, length);
+                          if (id !== newId) selectFile(listOfFiles[newId]);
+                        }}
+                        sx={{
+                          backgroundColor: buttonBackground,
+                          padding: iconPadding,
+                        }}
+                      >
+                        <ArrowDropDown fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {["image", "pdf", "svg", "jpg", "png"].includes(fileType) && (
+                    <Tooltip title="Zoom out (images and PDFs)">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setImageDelta(imageDelta - 250);
+                        }}
+                        sx={{
+                          backgroundColor: buttonBackground,
+                          padding: iconPadding,
+                        }}
+                      >
+                        <ZoomOut fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {["image", "pdf", "svg", "jpg", "png"].includes(fileType) && (
+                    <Tooltip title="Reset to fit width">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setImageDelta(0);
+                        }}
+                        sx={{
+                          backgroundColor: buttonBackground,
+                          padding: iconPadding,
+                        }}
+                      >
+                        <RestartAlt fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {["image", "pdf", "svg", "jpg", "png"].includes(fileType) && (
+                    <Tooltip title="Zoom in (images and PDFs)">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setImageDelta(imageDelta + 250);
+                        }}
+                        sx={{
+                          backgroundColor: buttonBackground,
+                          padding: iconPadding,
+                        }}
+                      >
+                        <ZoomIn fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {["image", "svg", "jpg", "png"].includes(fileType) && (
+                    <Tooltip title="Toggle fitting image to height">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setFitHeight(
+                            fitHeight === undefined ? true : !fitHeight
+                          );
+                        }}
+                        sx={{
+                          backgroundColor: fitHeight ? "#e3f2fd" : "#e8e8e8",
+                          padding: iconPadding,
+                        }}
+                      >
+                        <Height fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {fileType === "txt" && (
+                    <Tooltip title="Show Page Breaks (plain text files)">
+                      <FormControlLabel
+                        sx={{ marginRight: iconPadding + 0.5 }}
+                        control={
+                          <Switch
+                            checked={showPageBreaks}
+                            onChange={() => {
+                              setShowPageBreaks(!showPageBreaks);
+                            }}
+                            name="pagebreaks"
+                          />
+                        }
+                      />
+                    </Tooltip>
+                  )}
+                  <Tooltip title="Switch layout">
                     <FormControlLabel
+                      sx={{ marginRight: iconPadding + 0.5 }}
                       control={
                         <Switch
-                          checked={showPageBreaks}
+                          checked={alternateLayout}
                           onChange={() => {
-                            setShowPageBreaks(!showPageBreaks);
+                            setAlternateLayout(!alternateLayout);
                           }}
-                          name="pagebreaks"
+                          name="alternatelayout"
                         />
                       }
                     />
                   </Tooltip>
-                )}
-                <Tooltip title="Switch layout">
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={alternateLayout}
-                        onChange={() => {
-                          setAlternateLayout(!alternateLayout);
-                        }}
-                        name="alternatelayout"
-                      />
-                    }
-                  />
-                </Tooltip>
-                {["image", "pdf", "svg", "jpg", "png"].includes(fileType) && (
-                  <Tooltip title="Zoom out (images and PDFs)">
+                  <Tooltip title={`Compress by ${increment} pixels`}>
                     <IconButton
+                      size="small"
                       onClick={() => {
-                        setImageDelta(imageDelta - 250);
+                        setTopSpace(topSpace + increment);
                       }}
-                      sx={{ backgroundColor: buttonBackground }}
+                      // sx={{
+                      //   backgroundColor: buttonBackground,
+                      //   color: "yellow",
+                      // }}
                     >
-                      <ZoomOut />
+                      <Compress fontSize="small" />
                     </IconButton>
                   </Tooltip>
-                )}
-                {["image", "pdf", "svg", "jpg", "png"].includes(fileType) && (
-                  <Tooltip title="Reset to fit width">
+                  <Tooltip title={`Expand by ${increment} pixels`}>
                     <IconButton
+                      size="small"
                       onClick={() => {
-                        setImageDelta(0);
+                        setTopSpace(topSpace - increment);
                       }}
-                      sx={{ backgroundColor: buttonBackground }}
+                      // sx={{
+                      //   backgroundColor: buttonBackground,
+                      //   color: "yellow",
+                      // }}
                     >
-                      <RestartAlt />
+                      <Expand fontSize="small" />
                     </IconButton>
                   </Tooltip>
-                )}
-                {["image", "pdf", "svg", "jpg", "png"].includes(fileType) && (
-                  <Tooltip title="Zoom in (images and PDFs)">
-                    <IconButton
-                      onClick={() => {
-                        setImageDelta(imageDelta + 250);
-                      }}
-                      sx={{ backgroundColor: buttonBackground }}
-                    >
-                      <ZoomIn />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {["image", "svg", "jpg", "png"].includes(fileType) && (
-                  <Tooltip title="Toggle fitting image to height">
-                    <IconButton
-                      onClick={() => {
-                        setFitHeight(
-                          fitHeight === undefined ? true : !fitHeight
-                        );
-                      }}
-                      sx={{
-                        backgroundColor: fitHeight ? "#e3f2fd" : "#e8e8e8",
-                      }}
-                    >
-                      <Height />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {/* <Tooltip title="Experiment">
-                  <IconButton
-                    onClick={() => {
-                      experiment();
+                  {/* </Box> */}
+                </Grid>
+                <Grid item>
+                  <Typography
+                    sx={{
+                      mt: 1,
+                      ml: 2,
+                      fontSize: 14,
                     }}
-                    sx={{ backgroundColor: buttonBackground, color: "yellow" }}
                   >
-                    <Link />
-                  </IconButton>
-                </Tooltip> */}
-              </Box>
-            </Grid>
-            <Grid item xs={7}>
-              <Typography
-                sx={{
-                  mt: 2,
-                  fontSize: 12,
-                }}
-              >
-                {url}
-              </Typography>
-            </Grid>
+                    {url}
+                  </Typography>
+                </Grid>
+              </Toolbar>
+              {/* </Container> */}
+            </AppBar>
+
             <Grid item xs={alternateLayout ? 2 : 12} sx={{ mt: 0.5 }}>
               <TextField
                 id="fileDirectory"
@@ -972,6 +1085,7 @@ export default function App() {
               {!waitGetDir && (
                 <Tooltip title="Read the directory above">
                   <IconButton
+                    size="small"
                     onClick={() => {
                       const parent0 = fileDirectory.endsWith("/")
                           ? fileDirectory.slice(0, -1)
@@ -984,9 +1098,9 @@ export default function App() {
                       setWaitGetDir(true);
                       getWebDav(parent);
                     }}
-                    size="small"
+                    sx={{ padding: iconPadding }}
                   >
-                    <ArrowCircleUp />
+                    <ArrowCircleUp fontSize="small" />
                   </IconButton>
                 </Tooltip>
               )}
