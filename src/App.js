@@ -75,6 +75,7 @@ export default function App() {
     { href } = window.location,
     mode = href.startsWith("http://localhost") ? "local" : "remote",
     server = href.split("//")[1].split("/")[0],
+    [showLeftPanel, setShowLeftPanel] = useState(1),
     buttonBackground = "#e8e8e8",
     increment = 20, // pixels to change height of content by
     fileRef = createRef(),
@@ -422,8 +423,8 @@ export default function App() {
       } else {
         // remote mode
         const splitDots = url.split("/").pop().split("."),
-          tempFileType = splitDots.pop(),
-          isDirectory = [0, 1].includes(splitDots.length);
+          tempFileType = splitDots.pop();
+        // ,isDirectory = [0, 1].includes(splitDots.length);
         // setFileType(tempFileType);
         // console.log("tempFileType", tempFileType, "url", url, isDirectory);
         if (["xlsx", "csv"].includes(tempFileType)) {
@@ -697,35 +698,48 @@ export default function App() {
       fileDirBits.pop();
       const tempFileDir = fileDirBits.filter((element) => element),
         fileDir = tempFileDir.join("/");
-      // console.log("fileDir", fileDir);
       // Assumption: if filename has a . then it is a file, but if not it is a directory
       // console.log(tempFileName.split(".").length);
 
       // look for lsaf/webdav/repo and then use substring to just get the path within lsaf from /general or /clinical
-      const ind = file.indexOf("lsaf/webdav/repo");
-      let tf = tempFileName;
-      if (ind > 0) tf = tempFileName.substring(ind + 17);
+      const ind =
+        fileDir.indexOf("lsaf/webdav/repo") +
+        fileDir.indexOf("lsaf/webdav/work");
+      let short = fileDir;
+      if (ind > 0) short = fileDir.substring(ind + 17);
       // console.log(
       //   "file",
       //   file,
+      //   "fileDirBits",
+      //   fileDirBits,
+      //   "fileDir",
+      //   fileDir,
       //   "partialFile",
       //   partialFile,
       //   "urlPrefix",
       //   urlPrefix,
       //   "filePrefix",
       //   filePrefix,
-      //   "tf",
-      //   tf
+      //   "ind",
+      //   ind,
+      //   "tempFileName",
+      //   tempFileName,
+      //   "short",
+      //   short,
+      //   'tempFileName.split(".").length',
+      //   tempFileName.split(".").length
       // );
 
-      if (tempFileName.split(".").length > 1) setFileDirectory("/" + fileDir);
-      else {
-        if (partialFile.substring(0, 1) !== "/") {
-          setFileDirectory("/" + partialFile);
-          getWebDav("/" + partialFile);
+      if (tempFileName.split(".").length === 1) {
+        setFileDirectory("/" + short + "/" + tempFileName);
+        getWebDav("/" + short + "/" + tempFileName);
+      } else {
+        if (short.startsWith("/")) {
+          setFileDirectory(short);
+          getWebDav(short);
         } else {
-          setFileDirectory(partialFile);
-          getWebDav(partialFile);
+          setFileDirectory("/" + short);
+          getWebDav("/" + short);
         }
       }
     } else {
@@ -748,6 +762,21 @@ export default function App() {
     if (newText.length > 0) setContent(newText);
     // eslint-disable-next-line
   }, [showPageBreaks]);
+
+  // if we are in a frame, then dont show the left panel which allows loading directories and other files
+  useEffect(() => {
+    // console.log(
+    //   "fileRef",
+    //   fileRef,
+    //   window.self !== window.top,
+    //   "window.self",
+    //   window.self,
+    //   "window.top",
+    //   window.top
+    // );
+    if (window.self !== window.top) setShowLeftPanel(false);
+    else setShowLeftPanel(true);
+  }, [fileRef]);
 
   // console.log(
   //   "fileType",
@@ -1049,121 +1078,123 @@ export default function App() {
               {/* </Container> */}
             </AppBar>
 
-            <Grid item xs={alternateLayout ? 2 : 12} sx={{ mt: 0.5 }}>
-              <TextField
-                id="fileDirectory"
-                label="Directory"
-                value={fileDirectory}
-                size={"small"}
-                onChange={(e) => setFileDirectory(e.target.value)}
-                sx={{
-                  width: alternateLayout
-                    ? windowDimension.winWidth / 6
-                    : windowDimension.winWidth - 240,
-                  mt: 1,
-                }}
-              />
-              {!waitGetDir && (
-                <Tooltip title="Read directory and show a list of files to select from">
-                  <Button
-                    onClick={() => {
-                      setWaitGetDir(true);
-                      getWebDav(fileDirectory);
-                    }}
-                    size="small"
-                    sx={{
-                      m: 3,
-                      fontSize: 12,
-                      backgroundColor: "lightgray",
-                      color: "darkgreen",
-                    }}
-                  >
-                    Read
-                  </Button>
-                </Tooltip>
-              )}
-              {!waitGetDir && (
-                <Tooltip title="Read the directory above">
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      const parent0 = fileDirectory.endsWith("/")
-                          ? fileDirectory.slice(0, -1)
-                          : fileDirectory,
-                        parent1 = parent0.split("/");
-                      parent1.pop();
-                      const parent = parent1.join("/");
-                      // console.log(fileDirectory, parent0, parent1, parent);
-                      setFileDirectory(parent);
-                      setWaitGetDir(true);
-                      getWebDav(parent);
-                    }}
-                    sx={{ padding: iconPadding }}
-                  >
-                    <ArrowCircleUp fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              )}
-              {!waitSelectFile &&
-                listOfFiles &&
-                fileType === "txt" &&
-                fileViewerType === "log" && (
-                  <Tooltip title="Analyze and view log in the Log Viewer">
+            {showLeftPanel && (
+              <Grid item xs={alternateLayout ? 2 : 12} sx={{ mt: 0.5 }}>
+                <TextField
+                  id="fileDirectory"
+                  label="Directory"
+                  value={fileDirectory}
+                  size={"small"}
+                  onChange={(e) => setFileDirectory(e.target.value)}
+                  sx={{
+                    width: alternateLayout
+                      ? windowDimension.winWidth / 6
+                      : windowDimension.winWidth - 240,
+                    mt: 1,
+                  }}
+                />
+                {!waitGetDir && (
+                  <Tooltip title="Read directory and show a list of files to select from">
                     <Button
-                      variant="contained"
                       onClick={() => {
-                        window.open(
-                          logViewerPrefix + selectedFile.value,
-                          "_blank"
-                        );
+                        setWaitGetDir(true);
+                        getWebDav(fileDirectory);
                       }}
-                      sx={{ ml: 3 }}
+                      size="small"
+                      sx={{
+                        m: 3,
+                        fontSize: 12,
+                        backgroundColor: "lightgray",
+                        color: "darkgreen",
+                      }}
                     >
-                      View
+                      Read
                     </Button>
                   </Tooltip>
                 )}
-              {waitGetDir && <CircularProgress sx={{ ml: 9, mt: 2 }} />}
-              <Grid item xs={alternateLayout ? 12 : 5} sx={{ mt: 0.5 }}>
-                {!waitSelectFile && listOfFiles && (
-                  <Select
-                    placeholder="Choose a file"
-                    options={listOfFiles}
-                    value={selectedFile}
-                    onChange={selectFile}
-                    menuIsOpen={alternateLayout ? true : undefined}
-                    size={alternateLayout ? 25 : undefined}
-                    pageSize={alternateLayout ? 25 : undefined}
-                  />
+                {!waitGetDir && (
+                  <Tooltip title="Read the directory above">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        const parent0 = fileDirectory.endsWith("/")
+                            ? fileDirectory.slice(0, -1)
+                            : fileDirectory,
+                          parent1 = parent0.split("/");
+                        parent1.pop();
+                        const parent = parent1.join("/");
+                        // console.log(fileDirectory, parent0, parent1, parent);
+                        setFileDirectory(parent);
+                        setWaitGetDir(true);
+                        getWebDav(parent);
+                      }}
+                      sx={{ padding: iconPadding }}
+                    >
+                      <ArrowCircleUp fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 )}
-              </Grid>
-              <Grid item xs={alternateLayout ? 12 : 5} sx={{ mt: 0.5 }}>
                 {!waitSelectFile &&
-                  showSheetSelector &&
-                  sheetOptions &&
-                  alternateLayout &&
-                  fileType === "excel" && <Box sx={{ height: 275 }}></Box>}
-                {!waitSelectFile &&
-                  showSheetSelector &&
-                  sheetOptions &&
-                  fileType === "excel" && (
+                  listOfFiles &&
+                  fileType === "txt" &&
+                  fileViewerType === "log" && (
+                    <Tooltip title="Analyze and view log in the Log Viewer">
+                      <Button
+                        variant="contained"
+                        onClick={() => {
+                          window.open(
+                            logViewerPrefix + selectedFile.value,
+                            "_blank"
+                          );
+                        }}
+                        sx={{ ml: 3 }}
+                      >
+                        View
+                      </Button>
+                    </Tooltip>
+                  )}
+                {waitGetDir && <CircularProgress sx={{ ml: 9, mt: 2 }} />}
+                <Grid item xs={alternateLayout ? 12 : 5} sx={{ mt: 0.5 }}>
+                  {!waitSelectFile && listOfFiles && (
                     <Select
-                      placeholder="Choose a sheet"
-                      options={sheetOptions}
-                      value={selectedSheet}
-                      onChange={selectSheet}
+                      placeholder="Choose a file"
+                      options={listOfFiles}
+                      value={selectedFile}
+                      onChange={selectFile}
                       menuIsOpen={alternateLayout ? true : undefined}
-                      size={alternateLayout ? 3 : undefined}
-                      pageSize={alternateLayout ? 3 : undefined}
+                      size={alternateLayout ? 25 : undefined}
+                      pageSize={alternateLayout ? 25 : undefined}
                     />
                   )}
-              </Grid>
+                </Grid>
+                <Grid item xs={alternateLayout ? 12 : 5} sx={{ mt: 0.5 }}>
+                  {!waitSelectFile &&
+                    showSheetSelector &&
+                    sheetOptions &&
+                    alternateLayout &&
+                    fileType === "excel" && <Box sx={{ height: 275 }}></Box>}
+                  {!waitSelectFile &&
+                    showSheetSelector &&
+                    sheetOptions &&
+                    fileType === "excel" && (
+                      <Select
+                        placeholder="Choose a sheet"
+                        options={sheetOptions}
+                        value={selectedSheet}
+                        onChange={selectSheet}
+                        menuIsOpen={alternateLayout ? true : undefined}
+                        size={alternateLayout ? 3 : undefined}
+                        pageSize={alternateLayout ? 3 : undefined}
+                      />
+                    )}
+                </Grid>
 
-              {waitSelectFile && <CircularProgress sx={{ ml: 9, mt: 2 }} />}
-            </Grid>
+                {waitSelectFile && <CircularProgress sx={{ ml: 9, mt: 2 }} />}
+              </Grid>
+            )}
           </>
         }
-        <Grid item xs={alternateLayout ? 10 : 12}>
+        <Grid item xs={showLeftPanel ? (alternateLayout ? 10 : 12) : 12}>
           <Box
             ref={fileRef}
             sx={{
