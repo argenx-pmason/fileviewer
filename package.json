@@ -1,6 +1,6 @@
 {
-  "name": "codesamples",
-  "version": "0.1.0",
+  "name": "fileviewer",
+  "version": "1.0",
   "private": true,
   "homepage": "https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///general/biostat/tools/fileviewer",
   "dependencies": {
