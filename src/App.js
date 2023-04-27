@@ -63,6 +63,7 @@ import test_json from "./test/test.json";
 import test_mnf from "./test/test.mnf";
 import test_sas from "./test/test.sas";
 import test_csv from "./test/test.csv";
+import test_nosuffix from "./test/nosuffix";
 
 export default function App() {
   LicenseInfo.setLicenseKey(
@@ -86,6 +87,7 @@ export default function App() {
     [fileDirectory, setFileDirectory] = useState("/clinical/"),
     [showPageBreaks, setShowPageBreaks] = useState(true),
     [alternateLayout, setAlternateLayout] = useState(true),
+    [downloadSome, setDownloadSome] = useState(true),
     detectSize = () => {
       detectHW({
         winWidth: window.innerWidth,
@@ -101,6 +103,7 @@ export default function App() {
     [url, setURL] = useState(null),
     [fileName, setFileName] = useState(null),
     [fileType, setFileType] = useState(null),
+    [thisIsADir, setThisIsADir] = useState(null),
     [fileViewerType, setFileViewerType] = useState(null),
     [rows, setRows] = useState([null]),
     [cols, setCols] = useState(null),
@@ -122,16 +125,25 @@ export default function App() {
     // officeFileViewerPrefix =
     //   "https://view.officeapps.live.com/op/view.aspx?src=",
     // user selects file from list of files loaded from directory
+    cantViewTheseFileTypes = ["docx", "doc", "pptx", "ppt", "sas7bdat"], // list of file types that we can't yet view in the browser properly
     selectFile = (index) => {
       setWaitSelectFile(true);
       // console.log(index);
-      const { value } = index;
-      // eslint-disable-next-line
-      getFile(value);
-      document.title = value.split("/").pop();
-      setSelectedFile(index);
-      setSelection(value);
-      setURL(value);
+      const { value, fileType } = index;
+      console.log(index, fileType, downloadSome, cantViewTheseFileTypes);
+      // check file type against list of ones we want to download
+      if (downloadSome && cantViewTheseFileTypes.includes(fileType)) {
+        // download file rather than view it
+        console.log("downloading file: ", value, fileName);
+        downloadFile(value, fileName);
+      } else {
+        // eslint-disable-next-line
+        getFile(value);
+        document.title = value.split("/").pop();
+        setSelectedFile(index);
+        setSelection(value);
+        setURL(value);
+      }
       setWaitSelectFile(false);
     },
     // user selects excel file sheet from list of sheets loaded from excel file
@@ -157,7 +169,7 @@ export default function App() {
       fetch(file).then(function (response) {
         // console.log(response);
         response.text().then(function (text) {
-          console.log("ft", ft);
+          // console.log("ft", ft);
           setOriginalContent(text);
           const newText = analyse(text);
           setContent(newText);
@@ -358,6 +370,7 @@ export default function App() {
       if (mode === "local") {
         if (url === "test_lst") processText(test_lst, "txt");
         else if (url === "test_txt") processText(test_txt, "txt");
+        else if (url === "test_nosuffix") processText(test_nosuffix, "txt");
         else if (url === "test_sas") processText(test_sas, "sas");
         // else if (url === "test_job") processXmlFile(test_job);
         // else if (url === "test_mnf") processXmlFile(test_mnf);
@@ -426,7 +439,14 @@ export default function App() {
           tempFileType = splitDots.pop();
         // ,isDirectory = [0, 1].includes(splitDots.length);
         // setFileType(tempFileType);
-        // console.log("tempFileType", tempFileType, "url", url, isDirectory);
+        console.log(
+          "tempFileType",
+          tempFileType,
+          "url",
+          url,
+          "splitDots",
+          splitDots
+        );
         if (["xlsx", "csv"].includes(tempFileType)) {
           setWaitGetDir(true);
           // setFileType("excel");
@@ -453,7 +473,7 @@ export default function App() {
           setImageFile(url);
           setFileType("image");
         } else {
-          if (splitDots.length > 0) {
+          if (splitDots.length > 0 || thisIsADir === false) {
             setWaitGetDir(true);
             // process file depending on file type
             fetch(url).then(function (response) {
@@ -489,6 +509,7 @@ export default function App() {
           { id: 12, value: "test_mnf", label: "Text (mnf)" },
           { id: 13, value: "test_job", label: "Text (job)" },
           { id: 14, value: "test_doc", label: "Word (docx)" },
+          { id: 15, value: "test_nosuffix", label: "Text (no suffix)" },
           // { id: 15, value: "test_ppt", label: "PowerPoint (ppt)" },
         ]);
       } else await getDir(webDavPrefix + dir, 1, processXml);
@@ -519,6 +540,15 @@ export default function App() {
       // Here you can use the Data
       let dataXML = responseXML;
       let dataJSON = xmlToJson(dataXML.responseXML);
+      // if its not an array then we are not at a valid directory
+      if (
+        dataJSON["d:multistatus"]["d:response"].constructor.name !== "Array"
+      ) {
+        console.log("dataJSON", dataJSON);
+        setThisIsADir(false);
+        return;
+      }
+      setThisIsADir(true);
       const files = dataJSON["d:multistatus"]["d:response"].map((record) => {
         // console.log("record", record);
         let path = record["d:href"]["#text"],
@@ -665,6 +695,16 @@ export default function App() {
       window.removeEventListener("resize", detectSize);
     };
   }, [windowDimension]);
+
+  useEffect(() => {
+    // console.log("thisIsADir", thisIsADir);
+    if (thisIsADir === false) {
+      console.log("this might be a file since it is not a dir");
+      getFile(url);
+      setFileViewerType("txt");
+    }
+    // eslint-disable-next-line
+  }, [thisIsADir]);
 
   useEffect(() => {
     if (mode === "local") return;
@@ -1006,7 +1046,7 @@ export default function App() {
                   {fileType === "txt" && (
                     <Tooltip title="Show Page Breaks (plain text files)">
                       <FormControlLabel
-                        sx={{ marginRight: iconPadding + 0.5 }}
+                        sx={{ marginRight: iconPadding + 0.3 }}
                         control={
                           <Switch
                             checked={showPageBreaks}
@@ -1014,6 +1054,7 @@ export default function App() {
                               setShowPageBreaks(!showPageBreaks);
                             }}
                             name="pagebreaks"
+                            size="small"
                           />
                         }
                       />
@@ -1021,7 +1062,7 @@ export default function App() {
                   )}
                   <Tooltip title="Switch layout">
                     <FormControlLabel
-                      sx={{ marginRight: iconPadding + 0.5 }}
+                      sx={{ marginRight: iconPadding + 0.3 }}
                       control={
                         <Switch
                           checked={alternateLayout}
@@ -1029,6 +1070,22 @@ export default function App() {
                             setAlternateLayout(!alternateLayout);
                           }}
                           name="alternatelayout"
+                          size="small"
+                        />
+                      }
+                    />
+                  </Tooltip>
+                  <Tooltip title="Download files which we can't yet view">
+                    <FormControlLabel
+                      sx={{ marginRight: iconPadding + 0.3 }}
+                      control={
+                        <Switch
+                          checked={downloadSome}
+                          onChange={() => {
+                            setDownloadSome(!downloadSome);
+                          }}
+                          name="downloadsome"
+                          size="small"
                         />
                       }
                     />
