@@ -125,7 +125,17 @@ export default function App() {
     // officeFileViewerPrefix =
     //   "https://view.officeapps.live.com/op/view.aspx?src=",
     // user selects file from list of files loaded from directory
-    cantViewTheseFileTypes = ["docx", "doc", "pptx", "ppt", "sas7bdat"], // list of file types that we can't yet view in the browser properly
+    cantViewTheseFileTypes = [
+      "docx",
+      "doc",
+      "pptx",
+      "ppt",
+      "sas7bdat",
+      "zip",
+      "ico",
+      "jar",
+      "gz",
+    ], // list of file types that we can't yet view in the browser properly
     selectFile = (index) => {
       setWaitSelectFile(true);
       // console.log(index);
