@@ -178,14 +178,17 @@ export default function App() {
       setWaitGetDir(true);
       fetch(file).then(function (response) {
         // console.log(response);
-        response.text().then(function (text) {
+        response.text().then(async function (text) {
           // console.log("ft", ft);
           setOriginalContent(text);
+          setWaitGetDir(false);
+          setContent(text);
           const newText = analyse(text);
+          const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+          await delay(5000);
           setContent(newText);
           setFileViewerType(ft);
           setFileType("txt");
-          setWaitGetDir(false);
         });
       });
     },
@@ -445,8 +448,10 @@ export default function App() {
         }
       } else {
         // remote mode
-        const splitDots = url.split("/").pop().split("."),
-          tempFileType = splitDots.pop();
+        const splitDots = url.split("/").pop().split(".");
+        let tempFileType;
+        if (splitDots.length > 1) tempFileType = splitDots[1].split("?")[0];
+        else tempFileType = splitDots.pop();
         // ,isDirectory = [0, 1].includes(splitDots.length);
         // setFileType(tempFileType);
         console.log(
@@ -728,10 +733,13 @@ export default function App() {
           ? partialFile
           : urlPrefix + filePrefix + partialFile,
         tempFileName = file.split("/").pop(),
-        tempFileType = tempFileName.split(".").pop();
+        tempFileType = tempFileName.split(".").pop(),
+        version =
+          splitQuestionMarks.length > 2 ? "?" + splitQuestionMarks[2] : null,
+        fileWithVersion = version ? file + version : file;
       document.title = tempFileName;
-      setURL(file);
-      getFile(file);
+      setURL(fileWithVersion);
+      getFile(fileWithVersion);
       setFileName(tempFileName);
       setFileType(tempFileType);
       // console.log(tempFileName, tempFileType);
