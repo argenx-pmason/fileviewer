@@ -1,66 +1,1971 @@
-<html>
-  <head>
-    <script>
-      const href =
-        "https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A/general/biostat/tools/fileviewer/index.html?file=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/hv/argx-117-1901/biostat/staging/mad5_tables/output/txt/t_14.3.1.5_t_ae_posthoc.txt";
-      const splitQuestionMarks = href.split("?"),
-        urlPrefix = window.location.protocol + "//" + window.location.host,
-        filePrefix = "/lsaf/filedownload/sdd%3A//";
-      if (splitQuestionMarks.length > 1) {
-        const splitEquals = splitQuestionMarks[1].split("="),
-          partialFile = splitEquals[1],
-          file = partialFile.startsWith("http")
-            ? partialFile
-            : urlPrefix + filePrefix + partialFile,
-          tempFileName = file.split("/").pop(),
-          tempFileType = tempFileName.split(".").pop();
-        console.log(
-          urlPrefix,
-          filePrefix,
-          partialFile,
-          file,
-          tempFileName,
-          tempFileType
-        );
-        document.title = tempFileName;
-        // setURL(file);
-        // getFile(file);
-        // setFileName(tempFileName);
-        // setFileType(tempFileType);
-        // setFileViewerType(tempFileType);
-        // set the directory to that of the file which was passed in
-        const fileDirBits = file.split("%3A")[1].split("?")[0].split("/");
-        fileDirBits.pop();
-        const tempFileDir = fileDirBits.filter((element) => element),
-          fileDir = tempFileDir.join("/");
-        console.log("fileDir", fileDir, tempFileDir, fileDirBits);
-        // Assumption: if filename has a . then it is a file, but if not it is a directory
-        console.log("tempFileName", tempFileName);
-        console.log("partialFile", partialFile);
-        if (tempFileName.split(".").length > 1) {
-        }
-        //   setFileDirectory("/" + fileDir);
-        //   console.log("set dir");
-        else {
-          if (partialFile.substring(0, 1) !== "/") {
-            // setFileDirectory("/" + partialFile);
-            // getWebDav("/" + partialFile);
-          } else {
-            // setFileDirectory(partialFile);
-            // getWebDav(partialFile);
-          }
-        }
-      } else {
-        console.log(mode, fileDirectory);
-        getWebDav(fileDirectory);
-        // fetch(test_lst)
-        //   .then((r) => r.text())
-        //   .then((r) => {
-        //     setOriginalContent(r);
-        //     const newText = analyse(r);
-        //     setContent(newText);
-        //   });
-      }
-    </script>
-  </head>
+<!DOCTYPE html>
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2210 0 100 100%22><text y=%22.90em%22 font-size=%2290%22>😷</text></svg>"><meta charset="utf-8"/>
+<meta content="SAS 9.4" name="generator"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+				<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script> -->
+				<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/chart.min.js"></script>  -->
+
+				<!-- <script src="./jquery-2.1.3.min.js"></script> -->
+				<!-- <script src="./Chart-bundle-min.js"></script>  -->
+
+				<script>
+(function(Chart) {
+var isObject = function(obj) {
+var type = typeof obj;
+return type === 'object' && !!obj;
+}
+
+var dataValue = function(dataPoint, isHorizontal) {
+if (isObject(dataPoint)) {
+return isHorizontal ? dataPoint.x : dataPoint.y;
+}
+
+return dataPoint;
+}
+
+var cloneArray = function(srcAry) {
+var dstAry = [];
+var length = srcAry.length;
+
+for (var i = 0; i < length; i++) {
+dstAry.push(srcAry[i]);
+}
+return dstAry;
+};
+
+var setOriginalData = function(data) {
+data.originalData = data.datasets.map(function(dataset) {
+return cloneArray(dataset.data);
+});
+};
+
+// set calculated rate (xx%) to data.calculatedData
+var calculateRate = function(data, isHorizontal, precision) {
+var visibles = data.datasets.map(function(dataset) {
+if (!dataset._meta) return true;
+
+for (var i in dataset._meta) {
+return !dataset._meta[i].hidden;
+}
+});
+
+var datasetDataLength = 0;
+if (data && data.datasets && data.datasets[0] && data.datasets[0].data) {
+datasetDataLength = data.datasets[0].data.length;
+}
+var totals = Array.apply(null, new Array(datasetDataLength)).map(function(el, i) {
+return data.datasets.reduce(function(sum, dataset, j) {
+var key = dataset.stack;
+if (!sum[key]) sum[key] = 0;
+sum[key] += dataValue(dataset.data[i], isHorizontal) * visibles[j];
+
+return sum;
+}, {});
+});
+
+data.calculatedData = data.datasets.map(function(dataset, i) {
+return dataset.data.map(function(val, i) {
+var total = totals[i][dataset.stack];
+var dv = dataValue(val, isHorizontal);
+return dv && total ? round(dv / total, precision) : 0;
+});
+});
+};
+
+var getPrecision = function(pluginOptions) {
+// return the (validated) configured precision from pluginOptions or default 1
+var defaultPrecision = 1;
+if (!pluginOptions.hasOwnProperty("precision")) return defaultPrecision;
+if (!pluginOptions.precision) return defaultPrecision;
+var optionsPrecision = Math.floor(pluginOptions.precision);
+if (isNaN(optionsPrecision)) return defaultPrecision;
+if (optionsPrecision < 0 || optionsPrecision > 16) return defaultPrecision;
+return optionsPrecision;
+};
+
+var round = function(value, precision) {
+var multiplicator = Math.pow(10, precision);
+return Math.round(value * 100 * multiplicator) / multiplicator;
+};
+
+var tooltipLabel = function(isHorizontal) {
+return function(tooltipItem, data) {
+var datasetIndex = tooltipItem.datasetIndex;
+var index = tooltipItem.index;
+var datasetLabel = data.datasets[datasetIndex].label || "";
+var originalValue = data.originalData[datasetIndex][index];
+var rateValue = data.calculatedData[datasetIndex][index];
+
+return "" + datasetLabel + ": " + rateValue + "% (" + dataValue(originalValue, isHorizontal) + ")";
+}
+};
+
+var reflectData = function(srcData, datasets) {
+if (!srcData) return;
+
+srcData.forEach(function(data, i) {
+datasets[i].data = data;
+});
+};
+
+var isHorizontalChart = function(chartInstance) {
+return chartInstance.config.type === "horizontalBar";
+}
+
+var Stacked100Plugin = {
+id: "stacked100",
+
+beforeInit: function(chartInstance, pluginOptions) {
+if (!pluginOptions.enable) return;
+
+var xAxes = chartInstance.options.scales.xAxes;
+var yAxes = chartInstance.options.scales.yAxes;
+var isVertical = chartInstance.config.type === "bar" || chartInstance.config.type === "line";
+
+[xAxes, yAxes].forEach(function(axes) {
+axes.forEach(function(hash) {
+hash.stacked = true;
+});
+});
+(isVertical ? yAxes : xAxes).forEach(function(hash) {
+if (!hash.ticks.min) hash.ticks.min = 0;
+if (!hash.ticks.max) hash.ticks.max = 100;
+});
+
+// Replace tooltips
+if (pluginOptions.hasOwnProperty("replaceTooltipLabel") && !pluginOptions.replaceTooltipLabel) return;
+chartInstance.options.tooltips.callbacks.label = tooltipLabel(isHorizontalChart(chartInstance));
+},
+
+beforeDatasetsUpdate: function(chartInstance, pluginOptions) {
+if (!pluginOptions.enable) return;
+
+setOriginalData(chartInstance.data);
+var precision = getPrecision(pluginOptions);
+calculateRate(chartInstance.data, isHorizontalChart(chartInstance), precision);
+reflectData(chartInstance.data.calculatedData, chartInstance.data.datasets);
+},
+
+afterDatasetsUpdate: function(chartInstance, pluginOptions) {
+if (!pluginOptions.enable) return;
+
+reflectData(chartInstance.data.originalData, chartInstance.data.datasets);
+}
+};
+
+Chart.pluginService.register(Stacked100Plugin);
+}.call(this, Chart));
+
+</script>
+<title>argx-117-2002</title>
+<style>
+/*<![CDATA[*/
+.body.c > table, .body.c > pre, .body.c div > table,
+.body.c div > pre, .body.c > table, .body.c > pre,
+.body.j > table, .body.j > pre, .body.j div > table,
+.body.j div > pre, .body.j > table, .body.j > pre,
+.body.c p.note, .body.c p.warning, .body.c p.error, .body.c p.fatal,
+.body.j p.note, .body.j p.warning, .body.j p.error, .body.j p.fatal,
+.body.c > table.layoutcontainer, .body.j > table.layoutcontainer { margin-left: auto; margin-right: auto }
+.layoutregion.l table, .layoutregion.l pre, .layoutregion.l p.note,
+.layoutregion.l p.warning, .layoutregion.l p.error, .layoutregion.l p.fatal { margin-left: 0 }
+.layoutregion.c table, .layoutregion.c pre, .layoutregion.c p.note,
+.layoutregion.c p.warning, .layoutregion.c p.error, .layoutregion.c p.fatal { margin-left: auto; margin-right: auto }
+.layoutregion.r table, .layoutregion.r pre, .layoutregion.r p.note,
+.layoutregion.r table, .layoutregion.r pre, .layoutregion.r p.note,
+.layoutregion.r p.warning, .layoutregion.r p.error, .layoutregion.r p.fatal { margin-right: 0 }
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display: block }
+html{ font-size: 100% }
+.body { margin: 1em; font-size: 13px; line-height: 1.231 }
+sup { position: relative; vertical-align: baseline; bottom: 0.25em; font-size: 0.8em }
+sub { position: relative; vertical-align: baseline; top: 0.25em; font-size: 0.8em }
+ul, ol { margin: 1em 0; padding: 0 0 0 40px }
+dd { margin: 0 0 0 40px }
+nav ul, nav ol { list-style: none; list-style-image: none; margin: 0; padding: 0 }
+img { border: 0; vertical-align: middle }
+svg:not(:root) { overflow: hidden }
+figure { margin: 0 }
+table { border-collapse: collapse; border-spacing: 0 }
+.layoutcontainer { border-collapse: separate; border-spacing: 0 }
+p { margin-top: 0; text-align: left }
+h1.heading1 { text-align: left }
+h2.heading2 { text-align: left }
+h3.heading3 { text-align: left }
+h4.heading4 { text-align: left }
+h5.heading5 { text-align: left }
+h6.heading6 { text-align: left }
+span { text-align: left }
+table { margin-bottom: 1em }
+td, th { text-align: left; padding: 3px 6px; vertical-align: top }
+td[class$="fixed"], th[class$="fixed"] { white-space: pre }
+section, article { padding-top: 1px; padding-bottom: 8px }
+hr.pagebreak { height: 0px; border: 0; border-bottom: 1px solid #c0c0c0; margin: 1em 0 }
+.stacked-value { text-align: left; display: block }
+.stacked-cell > .stacked-value, td.data > td.data, th.data > td.data, th.data > th.data, td.data > th.data, th.header > th.header { border: 0 }
+.stacked-cell > div.data { border-width: 0 }
+.systitleandfootercontainer { white-space: nowrap; margin-bottom: 1em }
+.systitleandfootercontainer > p { margin: 0 }
+.systitleandfootercontainer > p > span { display: inline-block; width: 100%; white-space: normal }
+.batch { display: table }
+.toc { display: none }
+.proc_note_group, .proc_title_group { margin-bottom: 1em }
+p.proctitle { margin: 0 }
+p.note, p.warning, p.error, p.fatal { display: table }
+.notebanner, .warnbanner, .errorbanner, .fatalbanner,
+.notecontent, .warncontent, .errorcontent, .fatalcontent { display: table-cell; padding: 0.5em }
+.notebanner, .warnbanner, .errorbanner, .fatalbanner { padding-right: 0 }
+.body > div > ol li { text-align: left }
+.beforecaption > h4 { margin-top: 0; margin-bottom: 0 }
+.c { text-align: center }
+.r { text-align: right }
+.l { text-align: left }
+.j { text-align: justify }
+.d { text-align: right }
+.b { vertical-align: bottom }
+.m { vertical-align: middle }
+.t { vertical-align: top }
+.accessiblecaption {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 0;
+}
+.aligncontents {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+text-align: left;
+vertical-align: middle;
+}
+.batch {
+background-color: #ffffff;
+border-color: #a6bd89;
+border-style: solid;
+border-width: 2px 1px 1px 2px;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+vertical-align: middle;
+}
+.body {
+background-color: #ffffff;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.bodytext {
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-weight: bold;
+padding: 0;
+}
+.cell {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.column {
+background-color: #ffffff;
+border-color: #a6bd89;
+border-style: solid;
+border-width: 2px 1px 1px 2px;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+vertical-align: middle;
+}
+.container {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.contentitem {
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 10pt;
+}
+.contentproclabel, .contentprocname {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.contents {
+background-color: #f6f5ea;
+color: #000000;
+list-style-type: decimal;
+margin-left: 8px;
+margin-right: 8px;
+}
+.contentsdate {
+background-color: #ffffff;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+width: 100%;
+}
+.contenttitle {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: italic;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.continued {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.data {
+background-color: #ffffff;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', Helvetica, sans-serif;
+font-size: 8pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 3px;
+}
+.dataemphasis, .dataemphasisfixed {
+background-color: #ffffff;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', Helvetica, sans-serif;
+font-size: 8pt;
+font-style: italic;
+font-weight: normal;
+margin: 0;
+padding: 3px;
+}
+.dataempty {
+background-color: #ffffff;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', Helvetica, sans-serif;
+font-size: 8pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 3px;
+}
+.datafixed {
+background-color: #ffffff;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 8pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 3px;
+}
+.datafixedemphasis {
+background-color: #ffffff;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 8pt;
+font-style: italic;
+font-weight: normal;
+margin: 0;
+padding: 3px;
+}
+.datastrong {
+background-color: #ffffff;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', Helvetica, sans-serif;
+font-size: 8pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+}
+.datastrongfixed {
+background-color: #ffffff;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 8pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+}
+.date {
+background-color: #ffffff;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+width: 100%;
+}
+.default {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.document { }
+.drilldetaildata {
+background-color: #ffffff;
+color: #34699e;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-weight: normal;
+padding: 0;
+}
+.drilldetailhover {
+background-color: #ffffff;
+color: #34699e;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-weight: normal;
+padding: 0;
+text-decoration: underline;
+}
+.errorbanner, .errorcontent {
+background-color: #ffffff;
+border: 1px solid #a6bd89;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.errorcontentfixed {
+background-color: #ffffff;
+border: 1px solid #a6bd89;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.extendedpage {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.fatalbanner, .fatalcontent {
+background-color: #ffffff;
+border: 1px solid #a6bd89;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.fatalcontentfixed {
+background-color: #ffffff;
+border: 1px solid #a6bd89;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.folderaction {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.footer {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.footeremphasis {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: italic;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.footeremphasisfixed {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: italic;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.footerempty {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.footerfixed {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.footerstrong {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.footerstrongfixed {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.frame { }
+.graph, .graphcharts { border: 1px solid #a6bd89 }
+.graphcrumbtrail {
+border: 0 solid #3872ac;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 8pt;
+font-weight: normal;
+padding: 5px;
+}
+.header {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.headeremphasis {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: italic;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.headeremphasisfixed {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: italic;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.headerempty {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.headerfixed {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.headersandfooters {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.headerstrong {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.headerstrongfixed {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: center;
+vertical-align: middle;
+}
+.indexaction {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.linecontent {
+background-color: #ffffff;
+border: 1px solid #a6bd89;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.list, .list10, .list2, .list3, .list4, .list5, .list6, .list7, .list8, .list9, .listitem, .listitem10, .listitem2, .listitem3, .listitem4, .listitem5, .listitem6, .listitem7, .listitem8, .listitem9 {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.normaltext {
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-weight: bold;
+padding: 0;
+}
+.note, .notebanner, .notecontent {
+background-color: #ffffff;
+border: 1px solid #a6bd89;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.notecontentfixed {
+background-color: #ffffff;
+border: 1px solid #a6bd89;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.pagebreak {
+content: ' ';
+height: 1em;
+}
+.pages {
+background-color: #f6f5ea;
+color: #000000;
+list-style-type: decimal;
+margin-left: 8px;
+margin-right: 8px;
+}
+.pagesdate {
+background-color: #ffffff;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+width: 100%;
+}
+.pagesitem {
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 10pt;
+}
+.pagesproclabel, .pagesprocname {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.pagestitle {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: italic;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.paragraph, .parskip {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Trebuchet MS', Helvetica, Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: normal;
+margin: 0;
+padding: 5px;
+}
+.prepage {
+background-color: #ffffff;
+border: 1px solid #a6bd89;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.proctitle {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 0;
+}
+.proctitlefixed {
+background-color: transparent;
+border-color: #000000;
+border-width: 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 12pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 0;
+}
+.rowfooter {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowfooteremphasis {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: italic;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowfooteremphasisfixed {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: italic;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowfooterempty {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowfooterfixed {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowfooterstrong {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowfooterstrongfixed {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowheader {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowheaderemphasis {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: italic;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowheaderemphasisfixed {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: italic;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowheaderempty {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowheaderfixed {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowheaderstrong {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.rowheaderstrongfixed {
+background-color: #f6f5ea;
+border-color: #ccd6be;
+border-style: solid;
+border-width: 0 1px 1px 0;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.systemfooter, .systemfooter10, .systemfooter2, .systemfooter3, .systemfooter4, .systemfooter5, .systemfooter6, .systemfooter7, .systemfooter8, .systemfooter9 {
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+padding: 0;
+}
+.systemtitle, .systemtitle10, .systemtitle2, .systemtitle3, .systemtitle4, .systemtitle5, .systemtitle6, .systemtitle7, .systemtitle8, .systemtitle9 {
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 12pt;
+font-weight: bold;
+padding: 0;
+}
+.table {
+background-color: #ffffff;
+border-color: #a6bd89;
+border-style: solid;
+border-width: 2px 1px 1px 2px;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+vertical-align: middle;
+}
+.usertext, .warnbanner, .warncontent {
+background-color: #ffffff;
+border: 1px solid #a6bd89;
+border-spacing: 0;
+color: #000000;
+font-family: Arial, 'Albany AMT', sans-serif;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+.warncontentfixed {
+background-color: #ffffff;
+border: 1px solid #a6bd89;
+border-spacing: 0;
+color: #000000;
+font-family: 'Courier New', Courier, fixed;
+font-size: 9pt;
+font-style: normal;
+font-weight: bold;
+margin: 0;
+padding: 3px;
+text-align: left;
+vertical-align: middle;
+}
+/*]]>*/
+</style>
+</head>
+<body class="c body" style="border-spacing: 0">
+<table class="c layoutcontainer" style="border-spacing: 2px 0" role="presentation">
+<colgroup><col/><col/></colgroup>
+
+<tr class="layoutregion">
+<td class="c layoutregion"><p class="m usertext" style="border-spacing: 0">/argx-117/mmn/argx-117-2002/patient_profiles - Status report created on 26JUN23 02:46 GMT</p>
+</td><td class="c layoutregion"></td></tr>
+<tr class="layoutregion">
+<td class="c layoutregion">
+				<canvas id="myChart" width="600" height="200"></canvas>
+				<script>
+					var chartElm = document.getElementById('myChart').getContext('2d');
+
+					var myChart = new Chart(chartElm, {
+						type: 'horizontalBar',
+						data: {
+							labels: ['Programs (3)','Outputs (3)'],
+							datasets: [
+								{
+									label: 'Completed',
+									data: [1,0],
+									backgroundColor: "rgba(154, 194, 67, 0.2)",
+									borderColor: 'rgba(154, 194, 67, 1)',
+									borderWidth: 1
+								},
+								{
+									label: 'Issues',
+									data: [2,3],
+									backgroundColor: "rgba(255, 99, 132, 0.2)",
+									borderColor: 'rgba(255, 99, 132, 1)',
+									borderWidth: 1
+								},
+								{
+									label: 'Expected',
+									data: [0,0],
+									backgroundColor: "rgba(54, 162, 235, 0.2)",
+									borderColor: 'rgba(19, 87, 140, 1)',
+									borderWidth: 1
+								}
+							]
+						},
+						options: {
+							scales: {
+								xAxes: [{
+									ticks: {
+										beginAtZero: true
+									}
+								}]
+							},
+							plugins: {
+								stacked100: { enable: true }
+							}
+						},
+					});
+				</script>
+
+
+<div style="padding-bottom: 8px; padding-top: 1px">
+<div style="padding-bottom: 8px; padding-top: 1px">
+<div style="padding-bottom: 8px; padding-top: 1px">
+<table class="table" style="border-spacing: 0" aria-label="Detailed and/or summarized report">
+<caption aria-label="Detailed and/or summarized report"></caption>
+<colgroup><col/><col/><col/><col/><col/></colgroup>
+<thead>
+<tr>
+<th class="c m header" style="border-spacing: 0" scope="col">SAS program</th>
+<th class="c m header" style="border-spacing: 0" scope="col">Program file<br/>exists</th>
+<th class="c m header" style="border-spacing: 0" scope="col">Job file</th>
+<th class="c m header" style="border-spacing: 0" scope="col">Job log file</th>
+<th class="c m header" style="border-spacing: 0" scope="col">Program header checks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">f_grip.sas</td>
+<td class="data" style="border-spacing: 0; width: 0.7in">Yes</td>
+<td class="data" style="border-spacing: 0; width: 0.7in">job_f_grip.job</td>
+<td class="data" style="border-spacing: 0; width: 2.5in">clean</td>
+<td class="data" style="border-spacing: 0; width: 1in">0 Fails, 5 Pass</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">f_pp.sas</td>
+<td class="data" style="border-spacing: 0; width: 0.7in">Yes</td>
+<td class="data" style="border-spacing: 0; width: 0.7in">job_f_pp.job</td>
+<td class="data" style="border-spacing: 0; width: 2.5in">0 Errors, 2 Warnings, 1 Uninitialized, 0 Notes</td>
+<td class="data" style="border-spacing: 0; width: 1in">0 Fails, 5 Pass</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">f_pp_saf.sas</td>
+<td class="data" style="border-spacing: 0; width: 0.7in">Yes</td>
+<td class="data" style="border-spacing: 0; width: 0.7in">job_f_pp_saf.job</td>
+<td class="data" style="border-spacing: 0; width: 2.5in">0 Errors, 7 Warnings, 1 Uninitialized, 0 Notes</td>
+<td class="data" style="border-spacing: 0; width: 1in">0 Fails, 5 Pass</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div style="padding-bottom: 8px; padding-top: 1px">
+<div id="IDX1" style="padding-bottom: 8px; padding-top: 1px">
+<div style="padding-bottom: 8px; padding-top: 1px">
+<table class="table" style="border-spacing: 0" aria-label="Detailed and/or summarized report">
+<caption aria-label="Detailed and/or summarized report"></caption>
+<colgroup><col/><col/></colgroup>
+<thead>
+<tr>
+<th class="c m header" style="border-spacing: 0" scope="col">Log output</th>
+<th class="c m header" style="border-spacing: 0" scope="col">Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in" title="Click to go to log file" aria-label="Click to go to log file"><a target="_blank" href="https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///general/biostat/tools/logviewer/index.html?log=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/mmn/argx-117-2002/biostat/staging/patient_profiles/log/_17_d_adsae.log">_17_d_adsae.log</a></td>
+<td class="data" style="border-spacing: 0; width: 5.5in">0 Errors, 1 Warnings, 0 Uninitialized, 0 Notes</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">1</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: Multiple lengths were specified for the BY variable usubjid by input data sets. This might cause unexpected results.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in" title="Click to go to log file" aria-label="Click to go to log file"><a target="_blank" href="https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///general/biostat/tools/logviewer/index.html?log=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/mmn/argx-117-2002/biostat/staging/patient_profiles/log/_18_d_advs.log">_18_d_advs.log</a></td>
+<td class="data" style="border-spacing: 0; width: 5.5in">0 Errors, 1 Warnings, 0 Uninitialized, 0 Notes</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">1</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: Multiple lengths were specified for the BY variable usubjid by input data sets. This might cause unexpected results.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in" title="Click to go to log file" aria-label="Click to go to log file"><a target="_blank" href="https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///general/biostat/tools/logviewer/index.html?log=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/mmn/argx-117-2002/biostat/staging/patient_profiles/log/_19_d_adcm.log">_19_d_adcm.log</a></td>
+<td class="data" style="border-spacing: 0; width: 5.5in">0 Errors, 1 Warnings, 0 Uninitialized, 0 Notes</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">1</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: Multiple lengths were specified for the BY variable USUBJID by input data sets. This might cause unexpected results.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in" title="Click to go to log file" aria-label="Click to go to log file"><a target="_blank" href="https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///general/biostat/tools/logviewer/index.html?log=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/mmn/argx-117-2002/biostat/staging/patient_profiles/log/_1_d_adgrip.log">_1_d_adgrip.log</a></td>
+<td class="data" style="border-spacing: 0; width: 5.5in">0 Errors, 0 Warnings, 1 Uninitialized, 0 Notes</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">1</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">NOTE: Variable ady is uninitialized.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in" title="Click to go to log file" aria-label="Click to go to log file"><a target="_blank" href="https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///general/biostat/tools/logviewer/index.html?log=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/mmn/argx-117-2002/biostat/staging/patient_profiles/log/_3_d_adsl.log">_3_d_adsl.log</a></td>
+<td class="data" style="border-spacing: 0; width: 5.5in">0 Errors, 2 Warnings, 0 Uninitialized, 0 Notes</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">1</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: Check Mapping of IVHDOSFRQ. subjid=0310013003</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">2</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: Check Mapping of IVHDOSFRQ. subjid=0310013006</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in" title="Click to go to log file" aria-label="Click to go to log file"><a target="_blank" href="https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///general/biostat/tools/logviewer/index.html?log=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/mmn/argx-117-2002/biostat/staging/patient_profiles/log/d_copyraw_tabno_not_found.log">d_copyraw_tabno_not_found.log</a></td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1 Errors, 0 Warnings, 0 Uninitialized, 1 Notes</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">1</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">ERROR: Libref RAW is not assigned.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">2</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">NOTE: The SAS System stopped processing this step because of errors.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in" title="Click to go to log file" aria-label="Click to go to log file"><a target="_blank" href="https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///general/biostat/tools/logviewer/index.html?log=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/mmn/argx-117-2002/biostat/staging/patient_profiles/log/f_11_f_grip.log">f_11_f_grip.log</a></td>
+<td class="data" style="border-spacing: 0; width: 5.5in">0 Errors, 3 Warnings, 0 Uninitialized, 0 Notes</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">1</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: The font &lt;sans-serif&gt; is not available. Albany AMT will be used.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in" title="Click to go to log file" aria-label="Click to go to log file"><a target="_blank" href="https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///general/biostat/tools/logviewer/index.html?log=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/mmn/argx-117-2002/biostat/staging/patient_profiles/log/f_14_f_pp.log">f_14_f_pp.log</a></td>
+<td class="data" style="border-spacing: 0; width: 5.5in">39 Errors, 3 Warnings, 0 Uninitialized, 0 Notes</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">1</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1488      +        %let error    = no;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">2</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1497      +        %if %gsdvalidparam01(charcase,up uplow mixed .) eq %then %let error = yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">3</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1498      +        %if %gsdvalidparam01(timeunit,hour day week)  eq %then %let error = yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">4</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1499      +        %if %gsdvalidparam01(pagesize,a4 a3 letter .)  eq %then %let error = yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">5</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1500      +        %if %gsdvalidparam01(rotate,landscape portrait .)  eq %then %let error = yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">6</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1501      +        %if %gsdvalidparam01(together,yes no)  eq %then %let error = yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">7</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1502      +        %if %gsdvalidparam01(gunit,cm in inch)  eq %then %let error = yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">8</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1506      +            %put ERROR: [GSD INTERRUPTION] Filename &amp;store does not point to a valid folder location;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">9</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1514      +              put &apos;ERROR: [GSD INTERRUPTION] No subjects selected in GSDSEL macro, please change selection in GSDSEL macro.&apos;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">10</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1515      +              call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">11</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1526      +                 put &apos;ERROR: [GSD INTERRUPTION] The selection variable &apos; name &apos;specified in [selvars] does not have a label, please assign a label for &apos; name &apos;;&apos;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">12</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1527      +                 call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">13</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1533      +        %if not %&amp;gsdvalidvars_v(&amp;chards,&amp;vars) %then %let error=yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">14</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1534      +        %if not %&amp;gsdvalidvars_v(&amp;chards,&amp;selvars) %then %let error=yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">15</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1547      +                    put &apos;ERROR: [GSD INTERRUPTION] Specified axis break [axisbrk] &apos; break &apos;does not fall between &apos; minmajor &apos;and &apos; maxmajor&apos;;&apos;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">16</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1548      +                    call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">17</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1554      +        %if &amp;error=yes %then %goto eom;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">18</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1745      +           %put ERROR: Macro parameter INDS must not be empty;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">19</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1753      +                 put &quot;ERROR: Subject : &quot; &amp;subjid &quot; has more than one zero time point in &amp;zerods data set [ZERODS]&quot;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">20</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1754      +                 call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">21</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1763      +                 put &quot;ERROR: Subject : &quot; &amp;subjid &quot; has more than one observation for characteristics IN &amp;chards data set [CHARDS]&quot;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">22</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1764      +                 call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">23</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1773      +                 put &quot;ERROR: Subject : &quot; &amp;subjid &quot; has more than one observation for links file IN &amp;linkds data set [LINKDS]&quot;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">24</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1774      +                 call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">25</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1783      +                 put &quot;ERROR: Subject : &quot; &amp;subjid &quot; has more than one set of limits IN &amp;limitds data set [LIMITDS]&quot;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">26</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1784      +                 call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">27</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1789      +        %if &amp;error=yes %then %goto eom;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">28</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">263       +        IF _ERROR_ = 1 OR LENGTH(orig_classpath) = 0 THEN DO;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">29</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">280       +        IF _ERROR_ = 1 OR LENGTH(current_classpath) = 0 THEN DO;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">30</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">3753      +       %local _optserror_;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">31</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">3754      +       %let _optserror_=%sysfunc(getoption(serror));</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">32</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">3755      +       options noserror;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">33</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">3837      +       options &amp;_optserror_;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">34</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">3865      +           %put ERROR: [GSD INTERRUPTION] Parameter %superq(vardesc) contains &amp;v but;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">35</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">3866      +           %put ERROR: [GSD INTERRUPTION] must be one of following values: &amp;varvalid;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">36</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">3870      +           %put ERROR: [GSD INTERRUPTION] Parameter [%upcase(&amp;varname)] contains &amp;v but;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">37</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">3871      +           %put ERROR: [GSD INTERRUPTION] must be one of following values: &amp;varvalid;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">38</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">3890      +              %put ERROR: [GSD INTERRUPTION] Variable &amp;_var not found in data set &amp;dataset;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">39</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">4573      +                    if input(lo,best.)&gt;input(hi,best.) then error lbtestcd lbstresu rangeg{i} &apos;has lower &gt; upper&apos;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">40</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">2594      +        /* rescale time variables to even intervals to avoid warning message on unevenly spaces intervals */</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">41</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">4314      +  %else %put ARROW SYSTEM WARNING: No data sets with prefix &amp;dsroot deleted by DCLEAR04 ;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">42</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">4536      +           if inactg and not found then put &apos;WARNING: Test &apos; lbtestcd &apos; not in data with same unit as in ACTG grading table &apos;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in" title="Click to go to log file" aria-label="Click to go to log file"><a target="_blank" href="https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///general/biostat/tools/logviewer/index.html?log=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/mmn/argx-117-2002/biostat/staging/patient_profiles/log/f_16_f_pp_saf.log">f_16_f_pp_saf.log</a></td>
+<td class="data" style="border-spacing: 0; width: 5.5in">39 Errors, 3 Warnings, 0 Uninitialized, 0 Notes</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">1</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1488      +        %let error    = no;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">2</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1497      +        %if %gsdvalidparam01(charcase,up uplow mixed .) eq %then %let error = yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">3</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1498      +        %if %gsdvalidparam01(timeunit,hour day week)  eq %then %let error = yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">4</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1499      +        %if %gsdvalidparam01(pagesize,a4 a3 letter .)  eq %then %let error = yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">5</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1500      +        %if %gsdvalidparam01(rotate,landscape portrait .)  eq %then %let error = yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">6</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1501      +        %if %gsdvalidparam01(together,yes no)  eq %then %let error = yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">7</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1502      +        %if %gsdvalidparam01(gunit,cm in inch)  eq %then %let error = yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">8</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1506      +            %put ERROR: [GSD INTERRUPTION] Filename &amp;store does not point to a valid folder location;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">9</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1514      +              put &apos;ERROR: [GSD INTERRUPTION] No subjects selected in GSDSEL macro, please change selection in GSDSEL macro.&apos;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">10</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1515      +              call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">11</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1526      +                 put &apos;ERROR: [GSD INTERRUPTION] The selection variable &apos; name &apos;specified in [selvars] does not have a label, please assign a label for &apos; name &apos;;&apos;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">12</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1527      +                 call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">13</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1533      +        %if not %&amp;gsdvalidvars_v(&amp;chards,&amp;vars) %then %let error=yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">14</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1534      +        %if not %&amp;gsdvalidvars_v(&amp;chards,&amp;selvars) %then %let error=yes;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">15</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1547      +                    put &apos;ERROR: [GSD INTERRUPTION] Specified axis break [axisbrk] &apos; break &apos;does not fall between &apos; minmajor &apos;and &apos; maxmajor&apos;;&apos;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">16</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1548      +                    call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">17</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1554      +        %if &amp;error=yes %then %goto eom;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">18</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1745      +           %put ERROR: Macro parameter INDS must not be empty;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">19</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1753      +                 put &quot;ERROR: Subject : &quot; &amp;subjid &quot; has more than one zero time point in &amp;zerods data set [ZERODS]&quot;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">20</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1754      +                 call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">21</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1763      +                 put &quot;ERROR: Subject : &quot; &amp;subjid &quot; has more than one observation for characteristics IN &amp;chards data set [CHARDS]&quot;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">22</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1764      +                 call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">23</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1773      +                 put &quot;ERROR: Subject : &quot; &amp;subjid &quot; has more than one observation for links file IN &amp;linkds data set [LINKDS]&quot;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">24</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1774      +                 call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">25</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">1783      +                 put &quot;ERROR: Subject : &quot; &amp;subjid &quot; has more than one set of limits IN &amp;limitds data set [LIMITDS]&quot;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">26</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1784      +                 call symput(&apos;error&apos;,&apos;yes&apos;);</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">27</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">1789      +        %if &amp;error=yes %then %goto eom;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">28</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">263       +        IF _ERROR_ = 1 OR LENGTH(orig_classpath) = 0 THEN DO;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">29</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">280       +        IF _ERROR_ = 1 OR LENGTH(current_classpath) = 0 THEN DO;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">30</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">3753      +       %local _optserror_;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">31</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">3754      +       %let _optserror_=%sysfunc(getoption(serror));</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">32</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">3755      +       options noserror;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">33</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">3837      +       options &amp;_optserror_;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">34</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">3865      +           %put ERROR: [GSD INTERRUPTION] Parameter %superq(vardesc) contains &amp;v but;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">35</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">3866      +           %put ERROR: [GSD INTERRUPTION] must be one of following values: &amp;varvalid;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">36</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">3870      +           %put ERROR: [GSD INTERRUPTION] Parameter [%upcase(&amp;varname)] contains &amp;v but;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">37</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">3871      +           %put ERROR: [GSD INTERRUPTION] must be one of following values: &amp;varvalid;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">38</td>
+<td class="data" style="background-color: #ffc0cb; border-spacing: 0; width: 5.5in">3890      +              %put ERROR: [GSD INTERRUPTION] Variable &amp;_var not found in data set &amp;dataset;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">39</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">4573      +                    if input(lo,best.)&gt;input(hi,best.) then error lbtestcd lbstresu rangeg{i} &apos;has lower &gt; upper&apos;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">40</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">2594      +        /* rescale time variables to even intervals to avoid warning message on unevenly spaces intervals */</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">41</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">4314      +  %else %put ARROW SYSTEM WARNING: No data sets with prefix &amp;dsroot deleted by DCLEAR04 ;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">42</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">4536      +           if inactg and not found then put &apos;WARNING: Test &apos; lbtestcd &apos; not in data with same unit as in ACTG grading table &apos;;</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in" title="Click to go to log file" aria-label="Click to go to log file"><a target="_blank" href="https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///general/biostat/tools/logviewer/index.html?log=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/mmn/argx-117-2002/biostat/staging/patient_profiles/log/job_f_pp.log">job_f_pp.log</a></td>
+<td class="data" style="border-spacing: 0; width: 5.5in">0 Errors, 2 Warnings, 1 Uninitialized, 0 Notes</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">1</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: Duplication of by variable &quot;usubjid&quot; ignored.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">2</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: Over 20 axis tick marks were generated with the specified order= option using the default &apos;by 1&apos;. Therefore the specified axis order= was ignored, and the default order= algorithm was used.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">3</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">NOTE: Variable _page_ is uninitialized.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in" title="Click to go to log file" aria-label="Click to go to log file"><a target="_blank" href="https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///general/biostat/tools/logviewer/index.html?log=https://xarprod.ondemand.sas.com/lsaf/filedownload/sdd%3A///clinical/argx-117/mmn/argx-117-2002/biostat/staging/patient_profiles/log/job_f_pp_saf.log">job_f_pp_saf.log</a></td>
+<td class="data" style="border-spacing: 0; width: 5.5in">0 Errors, 7 Warnings, 1 Uninitialized, 0 Notes</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">1</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: Duplication of by variable &quot;usubjid&quot; ignored.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">2</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: Over 20 axis tick marks were generated with the specified order= option using the default &apos;by 1&apos;. Therefore the specified axis order= was ignored, and the default order= algorithm was used.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">3</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: String &apos;Face Rash with Mild Itching, Promptly Resolved After Cetirizine Administration : 1&apos; has been clipped to &apos;Face Rash with Mild Itching, Promptly Resolved After Cetiri&apos;.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">4</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: String &apos;Fever  Causing Missed Administration of IMP/PLACEBO : 1&apos; has been clipped to &apos;Fever  Causing Missed Administration of IMP/PLACEBO :&apos;.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">5</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: String &apos;Haemophilus B -meningococcal Conjugate Vaccine (Menitorix)&apos; has been clipped to &apos;Haemophilus B -meningococcal Conjugate Vaccine (Menito&apos;.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">6</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: String &apos;Mild Gastrointestinal Symptoms Causing Missed Administration of IMP/PLACEBO : 1&apos; has been clipped to &apos;Mild Gastrointestinal Symptoms Causing Missed Admini&apos;.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">7</td>
+<td class="data" style="background-color: #90ee90; border-spacing: 0; width: 5.5in">WARNING: String &apos;Revaxis - Diptheria, Tetanus, and Poliomyelitis Inactivated Vaccine&apos; has been clipped to &apos;Revaxis - Diptheria, Tetanus, and Poliomyelitis Inactivate&apos;.</td>
+</tr>
+<tr>
+<td class="data" style="border-spacing: 0; width: 1.4in">8</td>
+<td class="data" style="border-spacing: 0; width: 5.5in">NOTE: Variable _page_ is uninitialized.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</td><td class="c layoutregion"><p class="m usertext" style="border-spacing: 0">No SharePoint list defined</p>
+<div style="padding-bottom: 8px; padding-top: 1px">
+<div id="IDX2" style="padding-bottom: 8px; padding-top: 1px">
+<div style="padding-bottom: 8px; padding-top: 1px">
+<table class="table" style="border-spacing: 0" aria-label="Detailed and/or summarized report">
+<caption aria-label="Detailed and/or summarized report"></caption>
+<colgroup><col/><col/><col/><col/><col/><col/><col/><col/><col/></colgroup>
+<thead>
+<tr>
+<th class="c m header" style="border-spacing: 0" scope="col">SAP section</th>
+<th class="c m header" style="border-spacing: 0" scope="col">Output<br/>type</th>
+<th class="c m header" style="border-spacing: 0" scope="col">Output</th>
+<th class="c m header" style="border-spacing: 0" scope="col">txt</th>
+<th class="c m header" style="border-spacing: 0" scope="col">pdf</th>
+<th class="c m header" style="border-spacing: 0" scope="col">Output log file</th>
+<th class="c m header" style="border-spacing: 0" scope="col">Last<br/>Modification</th>
+<th class="c m header" style="border-spacing: 0" scope="col">Programmer</th>
+<th class="c m header" style="border-spacing: 0" scope="col">QC status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="c data" style="border-spacing: 0">&#160;</td>
+<td class="data" style="border-spacing: 0">Figure</td>
+<td class="data" style="border-spacing: 0">f_11_f_grip</td>
+<td class="data" style="border-spacing: 0">N</td>
+<td class="data" style="border-spacing: 0">N</td>
+<td class="c data" style="border-spacing: 0">&#160;</td>
+<td class="r data" style="border-spacing: 0">21JUN2023:13:06:36</td>
+<td class="data" style="border-spacing: 0">jkruszewska</td>
+<td class="c data" style="border-spacing: 0">&#160;</td>
+</tr>
+<tr>
+<td class="c data" style="border-spacing: 0">&#160;</td>
+<td class="data" style="border-spacing: 0">Figure</td>
+<td class="data" style="border-spacing: 0">f_14_f_pp</td>
+<td class="data" style="border-spacing: 0">N</td>
+<td class="data" style="border-spacing: 0">N</td>
+<td class="c data" style="border-spacing: 0">&#160;</td>
+<td class="r data" style="border-spacing: 0">20JUN2023:17:06:32</td>
+<td class="data" style="border-spacing: 0">cshekar</td>
+<td class="c data" style="border-spacing: 0">&#160;</td>
+</tr>
+<tr>
+<td class="c data" style="border-spacing: 0">&#160;</td>
+<td class="data" style="border-spacing: 0">Figure</td>
+<td class="data" style="border-spacing: 0">f_16_f_pp_saf</td>
+<td class="data" style="border-spacing: 0">N</td>
+<td class="data" style="border-spacing: 0">N</td>
+<td class="c data" style="border-spacing: 0">&#160;</td>
+<td class="r data" style="border-spacing: 0">21JUN2023:14:23:28</td>
+<td class="data" style="border-spacing: 0">cshekar</td>
+<td class="c data" style="border-spacing: 0">&#160;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</td></tr>
+</table>
+</body>
 </html>

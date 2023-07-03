@@ -136,18 +136,27 @@ export default function App() {
       "jar",
       "gz",
     ], // list of file types that we can't yet view in the browser properly
+    openTheseFileTypesNow = [
+      "html",
+      "htm",
+    ], // list of file types that we want to open in a new tab when selected
     selectFile = (index) => {
       setWaitSelectFile(true);
       // console.log(index);
       const { value, fileType } = index;
-      console.log(index, fileType, downloadSome, cantViewTheseFileTypes);
+      // console.log(index, fileType, downloadSome, cantViewTheseFileTypes);
       // check file type against list of ones we want to download
       if (downloadSome && cantViewTheseFileTypes.includes(fileType)) {
         // download file rather than view it
         console.log("downloading file: ", value, fileName);
         downloadFile(value, fileName);
-      } else {
-        // eslint-disable-next-line
+      } else
+        if (downloadSome && openTheseFileTypesNow.includes(fileType)) {
+          // download file rather than view it
+          console.log("open in new tab file: ", value, fileName);
+          openInNewTab(`${value}`);
+        } else {
+          // eslint-disable-next-line
         getFile(value);
         document.title = value.split("/").pop();
         setSelectedFile(index);
