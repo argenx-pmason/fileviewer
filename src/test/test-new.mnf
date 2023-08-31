@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<job-manifest version="3.0">
+  <type>WORKSPACE</type>
+  <job-submission id="8a73d4d1-9558-4442-8413-9e82812646a4" sessionId="624b108e-d830-467c-92d4-5ecac2e663f5" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">
+    <context>INTERACTIVE_RUN_AND_POPULATE_RELATIVE</context>
+    <submitted>2023-08-31T07:01:35Z</submitted>
+    <submitted-by>pmason</submitted-by>
+    <run-as-user>pmason</run-as-user>
+    <completed>2023-08-31T07:01:56Z</completed>
+    <state>COMPLETED_PROGRAM_WARNINGS</state>
+    <info>Job completed with program warnings.</info>
+  </job-submission>
+  <job>
+    <workspace-file date="2023-08-29T08:20:53Z" size="991" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/build_json_files.job</workspace-file>
+    <owner>pmason</owner>
+    <run-as-owner>false</run-as-owner>
+    <description/>
+    <logs>
+      <log type="SAS">
+        <workspace-file date="2023-08-31T07:01:56Z" size="205481" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/build_json_files.log</workspace-file>
+      </log>
+    </logs>
+    <results>
+      <result type="SAS">
+        <workspace-file date="2023-08-31T07:01:56Z" size="87527" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/build_json_files.lst</workspace-file>
+      </result>
+    </results>
+    <programs>
+      <program state="WARNINGS" time="20681">
+        <workspace-file date="2023-08-30T14:03:45Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas</workspace-file>
+      </program>
+    </programs>
+    <parameters/>
+    <inputs>
+      <input referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-29T14:46:05Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/_STAR_Holidays.xlsx</workspace-file>
+      </input>
+      <input referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-18T07:25:33Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/all_indications.sas</workspace-file>
+      </input>
+      <input referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-16T07:05:44Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/all_studies.sas</workspace-file>
+      </input>
+      <input referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-21T10:24:06Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/all_users.sas</workspace-file>
+      </input>
+      <input referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-30T11:49:35Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/default_key_dates.sas</workspace-file>
+      </input>
+      <input referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-31T07:01:36Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/key_dates.json</workspace-file>
+      </input>
+      <input referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-22T14:51:52Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/studies_info.sas</workspace-file>
+      </input>
+      <input referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-29T15:17:09Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/user_holidays.sas</workspace-file>
+      </input>
+      <input referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-30T14:23:02Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/user_messages.sas</workspace-file>
+      </input>
+      <input referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-01T11:51:01Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/studies_info.sas7bdat</workspace-file>
+      </input>
+      <input referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-01T00:07:11Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/studies_status.sas7bdat</workspace-file>
+      </input>
+      <input referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-01T13:32:29Z" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/maintenance/metadata/folder_access_request.xlsx</workspace-file>
+      </input>
+      <external-ref location="/sso/sfw/sas/940/SASFoundation/9.4/lsafapi/lsaf-sas-macro-2.6.1/sasmacros" name="lsaf_getchildren.sas" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="/sso/sfw/sas/940/SASFoundation/9.4/lsafapi/lsaf-sas-macro-2.6.1/sasmacros" name="lsaf_getproductname.sas" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="JSON" name="root" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="access_matrix" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="apr24" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="aug23" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="dec23" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="feb24" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="jan24" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="jul23" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="list" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="mar24" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="may24" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="nov23" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="oct23" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+      <external-ref location="XLSX" name="sep23" referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas"/>
+    </inputs>
+    <outputs>
+      <versioning enableVersioningOnNewFiles="false">MAJOR</versioning>
+      <output referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-31T07:01:36Z" size="118" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/all_indications.json</workspace-file>
+      </output>
+      <output referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-31T07:01:36Z" size="1875" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/all_studies.json</workspace-file>
+      </output>
+      <output referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-31T07:01:36Z" size="1204" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/all_users.json</workspace-file>
+      </output>
+      <output>
+        <workspace-file date="2023-08-31T07:01:56Z" size="205481" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/build_json_files.log</workspace-file>
+      </output>
+      <output>
+        <workspace-file date="2023-08-31T07:01:56Z" size="87527" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/build_json_files.lst</workspace-file>
+      </output>
+      <output referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-31T07:01:36Z" size="13540" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/default_key_dates.json</workspace-file>
+      </output>
+      <output referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-31T07:01:36Z" size="14466" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/key_dates.json</workspace-file>
+      </output>
+      <output referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-31T07:01:36Z" size="14466" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/previous_key_dates.json</workspace-file>
+      </output>
+      <output referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-31T07:01:45Z" size="2900" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/studies_info.json</workspace-file>
+      </output>
+      <output referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-31T07:01:56Z" size="116811" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/user_holidays.json</workspace-file>
+      </output>
+      <output referencingProgram="/general/biostat/metadata/projects/rm/build JSON files for studies dashboard.sas">
+        <workspace-file date="2023-08-31T07:01:36Z" size="30" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/user_messages.json</workspace-file>
+      </output>
+    </outputs>
+  </job>
+</job-manifest>
