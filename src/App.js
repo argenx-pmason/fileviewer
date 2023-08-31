@@ -61,6 +61,7 @@ import test_jpg from "./test/test.jpg";
 import test_job from "./test/test.job";
 import test_json from "./test/test.json";
 import test_mnf from "./test/test.mnf";
+import test_mnf2 from "./test/test-new.mnf";
 import test_sas from "./test/test.sas";
 import test_csv from "./test/test.csv";
 import test_nosuffix from "./test/nosuffix";
@@ -136,10 +137,7 @@ export default function App() {
       "jar",
       "gz",
     ], // list of file types that we can't yet view in the browser properly
-    openTheseFileTypesNow = [
-      "html",
-      "htm",
-    ], // list of file types that we want to open in a new tab when selected
+    openTheseFileTypesNow = ["html", "htm"], // list of file types that we want to open in a new tab when selected
     selectFile = (index) => {
       setWaitSelectFile(true);
       // console.log(index);
@@ -150,13 +148,12 @@ export default function App() {
         // download file rather than view it
         console.log("downloading file: ", value, fileName);
         downloadFile(value, fileName);
-      } else
-        if (downloadSome && openTheseFileTypesNow.includes(fileType)) {
-          // download file rather than view it
-          console.log("open in new tab file: ", value, fileName);
-          openInNewTab(`${value}`);
-        } else {
-          // eslint-disable-next-line
+      } else if (downloadSome && openTheseFileTypesNow.includes(fileType)) {
+        // download file rather than view it
+        console.log("open in new tab file: ", value, fileName);
+        openInNewTab(`${value}`);
+      } else {
+        // eslint-disable-next-line
         getFile(value);
         document.title = value.split("/").pop();
         setSelectedFile(index);
@@ -395,9 +392,10 @@ export default function App() {
         else if (url === "test_nosuffix") processText(test_nosuffix, "txt");
         else if (url === "test_sas") processText(test_sas, "sas");
         // else if (url === "test_job") processXmlFile(test_job);
-        // else if (url === "test_mnf") processXmlFile(test_mnf);
         else if (url === "test_job") processText(test_job, "xml");
+        // else if (url === "test_mnf") processXmlFile(test_mnf);
         else if (url === "test_mnf") processText(test_mnf, "xml");
+        else if (url === "test_mnf2") processText(test_mnf2, "txt");
         else if (url === "test_json") processText(test_json, "json");
         else if (url === "test_xlsx") {
           fetch(test_xlsx).then((response) => {
@@ -531,9 +529,10 @@ export default function App() {
           { id: 10, value: "test_sas", label: "Text (sas)" },
           { id: 11, value: "test_json", label: "Text (json)" },
           { id: 12, value: "test_mnf", label: "Text (mnf)" },
-          { id: 13, value: "test_job", label: "Text (job)" },
-          { id: 14, value: "test_doc", label: "Word (docx)" },
-          { id: 15, value: "test_nosuffix", label: "Text (no suffix)" },
+          { id: 13, value: "test_mnf2", label: "Text (mnf new version)" },
+          { id: 14, value: "test_job", label: "Text (job)" },
+          { id: 15, value: "test_doc", label: "Word (docx)" },
+          { id: 16, value: "test_nosuffix", label: "Text (no suffix)" },
           // { id: 15, value: "test_ppt", label: "PowerPoint (ppt)" },
         ]);
       } else await getDir(webDavPrefix + dir, 1, processXml);
@@ -556,7 +555,22 @@ export default function App() {
         },
         // pagebreak1 = "\n" + "-".repeat(50) + `> Page ${page}<` + "-".repeat(50) + "\n\n",
         pagebreak2 = "\n\n",
-        newText = text.replace(/\f/gm, showPageBreaks ? pageCount : pagebreak2);
+        newText = text
+          .replace(/\f/gm, showPageBreaks ? pageCount : pagebreak2)
+          .replace(/</gm, "&lt;")
+          .replace(/>/gm, "&gt;")
+          .replace(
+            /(\/general\/[\w|/|.|\s|-]+)/gm,
+            `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
+          )
+          .replace(
+            /(\/clinical\/[\w|/|.|\s|-]+)/gm,
+            `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
+          )
+          .replace(
+            /(\/Users\/[\w|/|.|\s|-]+)/gm,
+            `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
+          );
       return newText;
     },
     [originalContent, setOriginalContent] = useState(""),
@@ -752,9 +766,7 @@ export default function App() {
       setFileName(tempFileName);
       setFileType(tempFileType);
       // console.log(tempFileName, tempFileType);
-      setFileViewerType(
-        ["job", "mnf"].includes(tempFileType) ? "xml" : tempFileType
-      );
+      setFileViewerType(["job"].includes(tempFileType) ? "xml" : tempFileType);
       // set the directory to that of the file which was passed in
       const fileSplit = file.split("%3A");
       // console.log("fileSplit", fileSplit);
@@ -1294,7 +1306,7 @@ export default function App() {
             }}
             onClick={(e) => {
               const value = e.target.innerHTML.slice(1, -1);
-              console.log(value);
+              // console.log("e", e, "value", value);
               if (value.startsWith("/")) {
                 // handle absolute paths
                 window.open(fileViewerPrefix + value, "_blank");
@@ -1354,7 +1366,7 @@ export default function App() {
                 height={fitHeight ? windowDimension.winHeight - 250 : undefined}
                 alt="unable to be displayed"
               />
-            ) : fileType === "html" ? (
+            ) : ["html", "txt"].includes(fileType) ? (
               <pre
                 // className="content"
                 style={{
