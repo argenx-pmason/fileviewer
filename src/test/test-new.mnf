@@ -97,7 +97,7 @@
         <workspace-file date="2023-08-31T07:01:36Z" size="1204" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/all_users.json</workspace-file>
       </output>
       <output>
-        <workspace-file date="2023-08-31T07:01:56Z" size="205481" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/build_json_files.log</workspace-file>
+        <workspace-file date="2023-08-31T07:01:56Z" size="205481" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5" version="2077.0">/general/biostat/metadata/projects/rm/build_json_files.log</workspace-file>
       </output>
       <output>
         <workspace-file date="2023-08-31T07:01:56Z" size="87527" workspaceId="f3afe944-2536-41a3-9671-2e9b187539a5">/general/biostat/metadata/projects/rm/build_json_files.lst</workspace-file>

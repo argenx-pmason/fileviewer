@@ -68,7 +68,7 @@ import test_nosuffix from "./test/nosuffix";
 
 export default function App() {
   LicenseInfo.setLicenseKey(
-    "5b931c69b031b808de26d5902e04c36fTz00Njk0NyxFPTE2ODg4MDI3MDM3MjAsUz1wcm8sTE09c3Vic2NyaXB0aW9uLEtWPTI="
+    "369a1eb75b405178b0ae6c2b51263cacTz03MTMzMCxFPTE3MjE3NDE5NDcwMDAsUz1wcm8sTE09c3Vic2NyaXB0aW9uLEtWPTI="
   );
   let pageNumber = 1;
 
@@ -77,6 +77,7 @@ export default function App() {
     { href } = window.location,
     mode = href.startsWith("http://localhost") ? "local" : "remote",
     server = href.split("//")[1].split("/")[0],
+    processTextDelay = 2000,
     [showLeftPanel, setShowLeftPanel] = useState(1),
     buttonBackground = "#e8e8e8",
     increment = 20, // pixels to change height of content by
@@ -181,6 +182,7 @@ export default function App() {
         download: filename,
       }).click(),
     processText = (file, ft) => {
+      // console.log(file)
       setWaitGetDir(true);
       fetch(file).then(function (response) {
         // console.log(response);
@@ -189,102 +191,17 @@ export default function App() {
           setOriginalContent(text);
           setWaitGetDir(false);
           setContent(text);
-          const newText = analyse(text);
+          const newText = ["mnf", "lst"].includes(ft)
+            ? analyseHtml(text)
+            : analyse(text);
           const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-          await delay(5000);
+          await delay(processTextDelay);
           setContent(newText);
           setFileViewerType(ft);
           setFileType("txt");
         });
       });
     },
-    // processXmlFile = (file) => {
-    //   setWaitGetDir(true);
-    //   fetch(file).then(function (response) {
-    //     // console.log(response);
-    //     response.text().then(function (text) {
-    //       setOriginalContent(text);
-    //       const jsonText = xml2json(text, {
-    //           ignoreComment: true,
-    //           // alwaysChildren: true,
-    //           trim: true,
-    //           spaces: 3,
-    //         }),
-    //         json = JSON.parse(jsonText);
-    //       descend(json, 0);
-    //       processTempRows();
-    //       console.log("xmlRows", xmlRows);
-    //       setFileType("xml");
-    //       setWaitGetDir(false);
-    //     });
-    //   });
-    // },
-    // tempRows = [],
-    // descend = (ob, level) => {
-    //   const next = level + 1;
-    //   // console.log(ob, level);
-    //   const keys = Object.keys(ob);
-    //   keys.forEach((k) => {
-    //     tempRows.push([level, k]);
-    //     if (typeof ob[k] === "object") descend(ob[k], level + 1);
-    //     else tempRows.push([next, ob[k]]);
-    //   });
-    // },
-    // [xmlRows, setXmlRows] = useState(null),
-    // [xmlCols, setXmlCols] = useState(null),
-    // processTempRows = () => {
-    //   // console.log("tempRows", tempRows);
-    //   // const tempRows2 = tempRows.slice(0, 22);
-    //   const max = tempRows.length - 1;
-    //   let currentRow = {};
-    //   xmlMaxCol = 0; // maximum column number in XML array
-    //   const tempXmlRows = [];
-    //   tempRows.forEach((tr, i) => {
-    //     const nextCol = i < max ? tempRows[i + 1][0] : 0,
-    //       thisCol = tr[0];
-    //     if (thisCol > xmlMaxCol) xmlMaxCol = thisCol;
-    //     // console.log(thisCol, nextCol, tr);
-    //     currentRow[thisCol] = tr[1];
-    //     // console.log(currentRow);
-    //     if (thisCol > nextCol) {
-    //       tempXmlRows.push({ id: i, ...currentRow }); // write current row
-    //       // prepare row by only keeping higher level keys than the next one
-    //       Object.keys(currentRow).forEach((k) => {
-    //         if (k > nextCol) delete currentRow[k];
-    //       });
-    //     }
-    //   });
-    //   // define columns for xmlRows table
-    //   const tempXmlCols = Array.from({ length: xmlMaxCol + 1 }, (_, i) => ({
-    //     field: String(i),
-    //     headerName: utils.encode_col(i),
-    //   }));
-    //   console.log("tempXmlCols", tempXmlCols);
-    //   setXmlCols(tempXmlCols);
-    //   setXmlRows(tempXmlRows);
-    // },
-    // handleXmlClick = (params) => {
-    //   const { value } = params;
-    //   console.log(value, "fileDirectory", fileDirectory);
-    //   // check if value looks like it could be used to view a file
-    //   if (value.startsWith("/")) {
-    //     // handle absolute paths
-    //     window.open(fileViewerPrefix + value, "_blank");
-    //   }
-    //   if (value.startsWith("../")) {
-    //     // handle relative paths
-    //     const prefix0 = fileDirectory.split("/");
-    //     prefix0.pop();
-    //     const prefix = prefix0.join("/");
-    //     window.open(fileViewerPrefix + prefix + value.substring(2), "_blank");
-    //   }
-    //   if (value.startsWith("./")) {
-    //     window.open(
-    //       fileViewerPrefix + fileDirectory + value.substring(1),
-    //       "_blank"
-    //     );
-    //   }
-    // },
     [topSpace, setTopSpace] = useState(160),
     [currentExcelResp, setCurrentExcelResp] = useState(null),
     processExcel = (resp, sheetNumber = 0) => {
@@ -394,8 +311,8 @@ export default function App() {
         // else if (url === "test_job") processXmlFile(test_job);
         else if (url === "test_job") processText(test_job, "xml");
         // else if (url === "test_mnf") processXmlFile(test_mnf);
-        else if (url === "test_mnf") processText(test_mnf, "xml");
-        else if (url === "test_mnf2") processText(test_mnf2, "txt");
+        else if (url === "test_mnf") processText(test_mnf, "mnf");
+        else if (url === "test_mnf2") processText(test_mnf2, "mnf");
         else if (url === "test_json") processText(test_json, "json");
         else if (url === "test_xlsx") {
           fetch(test_xlsx).then((response) => {
@@ -494,6 +411,18 @@ export default function App() {
         } else if (["png", "svg", "jpg"].includes(tempFileType)) {
           setImageFile(url);
           setFileType("image");
+        } else if (["mnf", "lst"].includes(tempFileType)) {
+          setWaitGetDir(true);
+          fetch(url).then(function (response) {
+            response.text().then(function (text) {
+              setOriginalContent(text);
+              const newText = analyseHtml(text);
+              setContent(newText);
+              setFileType("txt");
+              setFileViewerType(tempFileType);
+              setWaitGetDir(false);
+            });
+          });
         } else {
           if (splitDots.length > 0 || thisIsADir === false) {
             setWaitGetDir(true);
@@ -529,7 +458,7 @@ export default function App() {
           { id: 10, value: "test_sas", label: "Text (sas)" },
           { id: 11, value: "test_json", label: "Text (json)" },
           { id: 12, value: "test_mnf", label: "Text (mnf)" },
-          { id: 13, value: "test_mnf2", label: "Text (mnf new version)" },
+          { id: 13, value: "test_mnf2", label: "Text (mnf new)" },
           { id: 14, value: "test_job", label: "Text (job)" },
           { id: 15, value: "test_doc", label: "Word (docx)" },
           { id: 16, value: "test_nosuffix", label: "Text (no suffix)" },
@@ -546,9 +475,9 @@ export default function App() {
           return (
             "\n\n" +
             "=".repeat(64) +
-            "> Page " +
+            "]- Page " +
             pageNumber +
-            " <" +
+            " -[" +
             "=".repeat(64) +
             "\n\n\n"
           );
@@ -557,20 +486,49 @@ export default function App() {
         pagebreak2 = "\n\n",
         newText = text
           .replace(/\f/gm, showPageBreaks ? pageCount : pagebreak2)
+          // .replace(/</gm, "&lt;")
+          // .replace(/>/gm, "&gt;")
+          // .replace(
+          //   /(\/general\/[\w|/|.|\s|-]+)/gm,
+          //   `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
+          // )
+          // .replace(
+          //   /(\/clinical\/[\w|/|.|\s|-]+)/gm,
+          //   `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
+          // )
+          // .replace(
+          //   /(\/Users\/[\w|/|.|\s|-]+)/gm,
+          //   `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
+          // );
+      return newText;
+    },
+    analyseHtml = (text) => {
+      console.log("analyseHtml");
+      const textArray = text.split("\n").map((line) => {
+        let app = fileViewerPrefix;
+        if (line.includes(".log")) app = logViewerPrefix;
+        let version = "";
+        if (line.includes("version="))
+          version = line.replace(/.*version="([\d|\\.]+)".*/gm, `?version=$1`);
+        const line2 = line
           .replace(/</gm, "&lt;")
           .replace(/>/gm, "&gt;")
           .replace(
-            /(\/general\/[\w|/|.|\s|-]+)/gm,
-            `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
+            /(\/general\/[\w|/|.|-]+)/gm,
+            `<a href='${app}$1${version}' target='_blank'>$1</a>`
           )
           .replace(
-            /(\/clinical\/[\w|/|.|\s|-]+)/gm,
-            `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
+            /(\/clinical\/[\w|/|.|-]+)/gm,
+            `<a href='${app}$1${version}' target='_blank'>$1</a>`
           )
           .replace(
-            /(\/Users\/[\w|/|.|\s|-]+)/gm,
-            `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
+            /(\/Users\/[\w|/|.|-]+)/gm,
+            `<a href='${app}$1${version}' target='_blank'>$1</a>`
           );
+        return line2;
+      });
+      console.log(textArray);
+      const newText = textArray.join("\n");
       return newText;
     },
     [originalContent, setOriginalContent] = useState(""),
@@ -756,7 +714,7 @@ export default function App() {
           ? partialFile
           : urlPrefix + filePrefix + partialFile,
         tempFileName = file.split("/").pop(),
-        tempFileType = tempFileName.split(".").pop(),
+        tempFileType = tempFileName.split("?")[0].split(".").pop(),
         version =
           splitQuestionMarks.length > 2 ? "?" + splitQuestionMarks[2] : null,
         fileWithVersion = version ? file + version : file;
@@ -765,7 +723,14 @@ export default function App() {
       getFile(fileWithVersion);
       setFileName(tempFileName);
       setFileType(tempFileType);
-      // console.log(tempFileName, tempFileType);
+      console.log(
+        "tempFileName",
+        tempFileName,
+        "tempFileType",
+        tempFileType,
+        "splitQuestionMarks",
+        splitQuestionMarks
+      );
       setFileViewerType(["job"].includes(tempFileType) ? "xml" : tempFileType);
       // set the directory to that of the file which was passed in
       const fileSplit = file.split("%3A");
@@ -786,28 +751,28 @@ export default function App() {
         fileDir.indexOf("lsaf/webdav/work");
       let short = fileDir;
       if (ind > 0) short = fileDir.substring(ind + 17);
-      // console.log(
-      //   "file",
-      //   file,
-      //   "fileDirBits",
-      //   fileDirBits,
-      //   "fileDir",
-      //   fileDir,
-      //   "partialFile",
-      //   partialFile,
-      //   "urlPrefix",
-      //   urlPrefix,
-      //   "filePrefix",
-      //   filePrefix,
-      //   "ind",
-      //   ind,
-      //   "tempFileName",
-      //   tempFileName,
-      //   "short",
-      //   short,
-      //   'tempFileName.split(".").length',
-      //   tempFileName.split(".").length
-      // );
+      console.log(
+        "file",
+        file,
+        "fileDirBits",
+        fileDirBits,
+        "fileDir",
+        fileDir,
+        "partialFile",
+        partialFile,
+        "urlPrefix",
+        urlPrefix,
+        "filePrefix",
+        filePrefix,
+        "ind",
+        ind,
+        "tempFileName",
+        tempFileName,
+        "short",
+        short,
+        'tempFileName.split(".").length',
+        tempFileName.split(".").length
+      );
 
       if (tempFileName.split(".").length === 1) {
         setFileDirectory("/" + short + "/" + tempFileName);
@@ -865,9 +830,7 @@ export default function App() {
   //   "fileDirectory",
   //   fileDirectory,
   //   "selectedFile",
-  //   selectedFile,
-  //   "docFile",
-  //   docFile
+  //   selectedFile
   // );
 
   return (
@@ -1366,7 +1329,8 @@ export default function App() {
                 height={fitHeight ? windowDimension.winHeight - 250 : undefined}
                 alt="unable to be displayed"
               />
-            ) : ["html", "txt"].includes(fileType) ? (
+            ) : ["html", "mnf", "lst"].includes(fileType) ||
+              ["mnf", "lst"].includes(fileViewerType) ? (
               <pre
                 // className="content"
                 style={{
