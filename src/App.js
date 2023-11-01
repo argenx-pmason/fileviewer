@@ -122,7 +122,7 @@ export default function App() {
     [selectedSheet, setSelectedSheet] = useState(null),
     [sheetOptions, setSheetOptions] = useState(null),
     [showSheetSelector, setShowSheetSelector] = useState(null),
-    logViewerPrefix = `https://${server}/lsaf/filedownload/sdd:/general/biostat/tools/logviewer/index.html?log=`,
+    logViewerPrefix = `https://${server}/lsaf/filedownload/sdd:/general/biostat/tools/logviewer2/index.html?log=`,
     fileViewerPrefix = `https://${server}/lsaf/filedownload/sdd:/general/biostat/tools/fileviewer/index.html?file=`,
     // officeFileViewerPrefix =
     //   "https://view.officeapps.live.com/op/view.aspx?src=",
@@ -153,6 +153,10 @@ export default function App() {
         // download file rather than view it
         console.log("open in new tab file: ", value, fileName);
         openInNewTab(`${value}`);
+      } else if (downloadSome && fileType === "log") {
+        // download file rather than view it
+        console.log("open in new tab file: ", value, fileName);
+        window.open(logViewerPrefix + value, "_blank");
       } else {
         // eslint-disable-next-line
         getFile(value);
@@ -484,22 +488,21 @@ export default function App() {
         },
         // pagebreak1 = "\n" + "-".repeat(50) + `> Page ${page}<` + "-".repeat(50) + "\n\n",
         pagebreak2 = "\n\n",
-        newText = text
-          .replace(/\f/gm, showPageBreaks ? pageCount : pagebreak2)
-          // .replace(/</gm, "&lt;")
-          // .replace(/>/gm, "&gt;")
-          // .replace(
-          //   /(\/general\/[\w|/|.|\s|-]+)/gm,
-          //   `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
-          // )
-          // .replace(
-          //   /(\/clinical\/[\w|/|.|\s|-]+)/gm,
-          //   `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
-          // )
-          // .replace(
-          //   /(\/Users\/[\w|/|.|\s|-]+)/gm,
-          //   `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
-          // );
+        newText = text.replace(/\f/gm, showPageBreaks ? pageCount : pagebreak2);
+      // .replace(/</gm, "&lt;")
+      // .replace(/>/gm, "&gt;")
+      // .replace(
+      //   /(\/general\/[\w|/|.|\s|-]+)/gm,
+      //   `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
+      // )
+      // .replace(
+      //   /(\/clinical\/[\w|/|.|\s|-]+)/gm,
+      //   `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
+      // )
+      // .replace(
+      //   /(\/Users\/[\w|/|.|\s|-]+)/gm,
+      //   `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
+      // );
       return newText;
     },
     analyseHtml = (text) => {
@@ -1262,7 +1265,7 @@ export default function App() {
               fontSize: fontSize,
               maxHeight: windowDimension.winHeight - topSpace,
               minWidth: alternateLayout
-                ? windowDimension.winWidth - 350
+                ? windowDimension.winWidth - 400
                 : windowDimension.winWidth - 50,
               height: windowDimension.winHeight - topSpace,
               overflow: "auto",
