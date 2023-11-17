@@ -13,6 +13,9 @@ import {
   CircularProgress,
   FormControlLabel,
   Switch,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from "@mui/material";
 import {
   Add,
@@ -28,6 +31,7 @@ import {
   ArrowDropDown,
   ArrowDropUp,
   ArrowCircleUp,
+  Info,
   Compress,
   Expand,
 } from "@mui/icons-material";
@@ -90,6 +94,7 @@ export default function App() {
     [showPageBreaks, setShowPageBreaks] = useState(true),
     [alternateLayout, setAlternateLayout] = useState(true),
     [downloadSome, setDownloadSome] = useState(true),
+    [openInfo, setOpenInfo] = useState(false),
     detectSize = () => {
       detectHW({
         winWidth: window.innerWidth,
@@ -113,7 +118,7 @@ export default function App() {
     // [pptFile, setPptFile] = useState(null),
     // [docFile, setDocFile] = useState(null),
     [imageFile, setImageFile] = useState(null),
-    [fitHeight, setFitHeight] = useState(undefined),
+    [fitHeight, setFitHeight] = useState(true),
     [page] = useState(1),
     [waitGetDir, setWaitGetDir] = useState(false),
     [waitSelectFile, setWaitSelectFile] = useState(false),
@@ -644,7 +649,7 @@ export default function App() {
       });
       chunk += "</table>";
       setFileType("html");
-      // console.log("chunk", chunk);
+      console.log("chunk", chunk);
       setOriginalContent(chunk);
       setContent(chunk);
     };
@@ -757,6 +762,7 @@ export default function App() {
       console.log(
         "file",
         file,
+        "\n",
         "fileDirBits",
         fileDirBits,
         "fileDir",
@@ -783,10 +789,10 @@ export default function App() {
       } else {
         if (short.startsWith("/")) {
           setFileDirectory(short);
-          getWebDav(short);
+          // getWebDav(short);
         } else {
           setFileDirectory("/" + short);
-          getWebDav("/" + short);
+          // getWebDav("/" + short);
         }
       }
     } else {
@@ -1042,6 +1048,7 @@ export default function App() {
                         sx={{
                           backgroundColor: fitHeight ? "#e3f2fd" : "#e8e8e8",
                           padding: iconPadding,
+                          mr: 1,
                         }}
                       >
                         <Height fontSize="small" />
@@ -1121,6 +1128,17 @@ export default function App() {
                       // }}
                     >
                       <Expand fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Information about this screen">
+                    <IconButton
+                      color="info"
+                      sx={{ position: "fixed", top: 2, right: 2, zIndex: 100 }}
+                      onClick={() => {
+                        setOpenInfo(true);
+                      }}
+                    >
+                      <Info />
                     </IconButton>
                   </Tooltip>
                   {/* </Box> */}
@@ -1355,6 +1373,56 @@ export default function App() {
           </Box>
         </Grid>
       </Grid>
+      {/* Dialog with General info about this screen */}
+      <Dialog
+        fullWidth
+        maxWidth="xl"
+        onClose={() => setOpenInfo(false)}
+        open={openInfo}
+        title={"Info about this screen"}
+      >
+        <DialogTitle>Info about this screen</DialogTitle>
+        <DialogContent>
+          <ul>
+            <li>Toolbar at the top - hover over icons to see what they do.</li>
+            <li>
+              Directory - you can enter a directory to read files from, by
+              pressing the <b>Read</b> button.
+            </li>
+            <li>
+              Up arrow will navigate up a level in directory, and read the files
+              in.
+            </li>
+            <li>
+              You can use the email button to ask questions or make suggestions
+              about this. Or to send a link you are currently looking at to
+              someone to see.
+            </li>
+          </ul>
+          <Tooltip title={"Email technical programmers"}>
+            <Button
+              sx={{
+                color: "blue",
+                border: 1,
+                borderColor: "blue",
+                borderRadius: 1,
+                padding: 0.4,
+                float: "right",
+              }}
+              onClick={() => {
+                window.open(
+                  "mailto:qs_tech_prog@argenx.com?subject=Question&body=This email was sent from: " +
+                    encodeURIComponent(href) +
+                    "%0D%0A%0D%0AMy question is:",
+                  "_blank"
+                );
+              }}
+            >
+              Email
+            </Button>
+          </Tooltip>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }
