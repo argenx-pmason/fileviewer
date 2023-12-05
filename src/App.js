@@ -42,6 +42,7 @@ import { LicenseInfo } from "@mui/x-data-grid-pro";
 import Select from "react-select";
 import { Document, Page } from "react-pdf/dist/esm/entry.webpack";
 import Highlight from "react-highlight";
+import JSZip from "jszip";
 // import hljs from "highlight.js";
 import { read, utils } from "xlsx";
 // import { xml2json } from "xml-js";
@@ -60,6 +61,7 @@ import test_xlsx from "./test/test.xlsx";
 import test1_xlsx from "./test/test1.xlsx";
 import test3_xlsx from "./test/test3.xlsx";
 import test_svg from "./test/test.svg";
+import test_zip from "./test/test.zip";
 import test_png from "./test/test.png";
 import test_jpg from "./test/test.jpg";
 import test_job from "./test/test.job";
@@ -118,6 +120,7 @@ export default function App() {
     // [pptFile, setPptFile] = useState(null),
     // [docFile, setDocFile] = useState(null),
     [imageFile, setImageFile] = useState(null),
+    [zipFile, setZipFile] = useState(null),
     [fitHeight, setFitHeight] = useState(true),
     [page] = useState(1),
     [waitGetDir, setWaitGetDir] = useState(false),
@@ -138,7 +141,6 @@ export default function App() {
       "pptx",
       "ppt",
       "sas7bdat",
-      "zip",
       "ico",
       "jar",
       "gz",
@@ -310,7 +312,7 @@ export default function App() {
     //   setContent(allFeedback);
     // },
     getFile = (url) => {
-      // console.log(url);
+      console.log(url);
       // local mode for test and development
       if (mode === "local") {
         if (url === "test_lst") processText(test_lst, "txt");
@@ -362,6 +364,29 @@ export default function App() {
         } else if (url === "test_svg") {
           setImageFile(test_svg);
           setFileType("image");
+        } else if (url === "test_zip") {
+          setZipFile(test_zip);
+          setFileType("zip");
+          handleZipFile(url);
+          fetch("./test/test.zip")
+            .then((response) => response.arrayBuffer())
+            .then((arrayBuffer) => {
+              // Use jszip to load the zip file contents
+              return JSZip.loadAsync(arrayBuffer);
+            })
+            .then((zip) => {
+              // Get an array of file names in the zip
+              const fileNames = Object.keys(zip.files);
+              console.log("Contents of the zip file:", fileNames);
+              setWaitGetDir(false);
+            })
+            .catch((error) => {
+              console.error(
+                "Error fetching or listing contents of the zip:",
+                error
+              );
+              setWaitGetDir(false);
+            });
         } else if (url === "test_png") {
           setImageFile(test_png);
           setFileType("image");
@@ -420,6 +445,11 @@ export default function App() {
         } else if (["png", "svg", "jpg"].includes(tempFileType)) {
           setImageFile(url);
           setFileType("image");
+        } else if (["zip"].includes(tempFileType)) {
+          setZipFile(url);
+          setFileType("zip");
+          setWaitGetDir(true);
+          handleZipFile(url);
         } else if (["mnf", "lst"].includes(tempFileType)) {
           setWaitGetDir(true);
           fetch(url).then(function (response) {
@@ -450,6 +480,37 @@ export default function App() {
         }
       }
     },
+    handleZipFile = (url) => {
+      fetch(url)
+        .then((response) => response.arrayBuffer())
+        .then((arrayBuffer) => {
+          // Use jszip to load the zip file contents
+          return JSZip.loadAsync(arrayBuffer);
+        })
+        .then((zip) => {
+          console.log("zip", zip);
+          // Get an array of file names in the zip
+          const fileNames = Object.keys(zip.files);
+          console.log("Contents of the zip file:", fileNames);
+          let content =
+            "<table><tr><th>File name</th><th>Directory</th><th>Compressed</th><th>Uncompressed</th><th>Date</th></tr>";
+          zip.forEach((relativePath, zipEntry) => {
+            console.log("relativePath", relativePath, "zipEntry", zipEntry);
+            content += `<tr><td>${zipEntry.name}</td><td>${zipEntry.dir}</td><td>${zipEntry._data.compressedSize}</td><td>${zipEntry._data.uncompressedSize}</td><td>${zipEntry.date}</td></tr>`;
+          });
+          content += "</table>";
+          setContent(content);
+          setWaitGetDir(false);
+        })
+        .catch((error) => {
+          console.error(
+            "Error fetching or listing contents of the zip:",
+            error
+          );
+          setContent("Error fetching or listing contents of the zip:" + error);
+          setWaitGetDir(false);
+        });
+    },
     getWebDav = async (dir) => {
       const webDavPrefix = urlPrefix + "/lsaf/webdav/repo";
       if (mode === "local") {
@@ -471,6 +532,7 @@ export default function App() {
           { id: 14, value: "test_job", label: "Text (job)" },
           { id: 15, value: "test_doc", label: "Word (docx)" },
           { id: 16, value: "test_nosuffix", label: "Text (no suffix)" },
+          { id: 17, value: "test_zip", label: "Zip (zip)" },
           // { id: 15, value: "test_ppt", label: "PowerPoint (ppt)" },
         ]);
       } else await getDir(webDavPrefix + dir, 1, processXml);
@@ -1350,7 +1412,7 @@ export default function App() {
                 height={fitHeight ? windowDimension.winHeight - 250 : undefined}
                 alt="unable to be displayed"
               />
-            ) : ["html", "mnf", "lst"].includes(fileType) ||
+            ) : ["html", "mnf", "lst", "zip"].includes(fileType) ||
               ["mnf", "lst"].includes(fileViewerType) ? (
               <pre
                 // className="content"
