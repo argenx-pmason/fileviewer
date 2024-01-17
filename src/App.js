@@ -643,7 +643,15 @@ export default function App() {
           partOfFile = {
             value: urlPrefix + path,
             fileType: fileType,
-            label: name,
+            label: isDirectory
+              ? name
+              : name +
+                (modified ? " (" : "") +
+                (modified ? modified : "") +
+                (modified ? ") " : "") +
+                (checkedOut && checkedOut !== "No" ? "checked-out " : "") +
+                (locked && locked !== "No" ? "locked " : ""),
+            // label: name,
             created: created,
             modified: modified,
             checkedOut: checkedOut,
@@ -687,7 +695,7 @@ export default function App() {
           return 0;
         });
 
-      // console.log("files", files);
+      console.log("files", files);
       const numberOfFilesFound = files.filter(
           (f) => f !== null && !f.isDirectory
         ).length,
