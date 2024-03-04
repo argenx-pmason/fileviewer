@@ -1468,6 +1468,16 @@ export default function App() {
               about this. Or to send a link you are currently looking at to
               someone to see.
             </li>
+            <li>
+              Take a look at this document that explains this screen some more:{" "}
+              <a
+                href={`https://argenxbvba.sharepoint.com/:w:/r/sites/Biostatistics/_layouts/15/doc.aspx?sourcedoc=%7B8533665c-c5e0-40a4-b5d8-0a72be75b201%7D`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                File Viewer User Guide
+              </a>
+            </li>
           </ul>
           <Tooltip title={"Email technical programmers"}>
             <Button
