@@ -26,6 +26,7 @@
     "react-simple-image-viewer": "^1.2.2",
     "stream": "^0.0.2",
     "web-vitals": "^2.1.4",
+    "webr": "^0.3.3",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.1/xlsx-0.19.1.tgz",
     "xml-js": "^1.6.11"
   },

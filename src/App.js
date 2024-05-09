@@ -71,6 +71,7 @@ import test_mnf2 from "./test/test-new.mnf";
 import test_sas from "./test/test.sas";
 import test_csv from "./test/test.csv";
 import test_nosuffix from "./test/nosuffix";
+import { WebR } from "webr";
 
 export default function App() {
   LicenseInfo.setLicenseKey(
@@ -79,7 +80,14 @@ export default function App() {
   let pageNumber = 1;
 
   // xmlMaxCol = 0;
-  const urlPrefix = window.location.protocol + "//" + window.location.host,
+  const webR = new WebR(),
+    experiment = async () => {
+      await webR.init();
+      let result = await webR.evalR("rnorm(10,5,1)");
+      let output = await result.toArray();
+      console.log("result of rnorm(10,5,1)", output);
+    },
+    urlPrefix = window.location.protocol + "//" + window.location.host,
     { href } = window.location,
     mode = href.startsWith("http://localhost") ? "local" : "remote",
     server = href.split("//")[1].split("/")[0],
@@ -781,6 +789,8 @@ export default function App() {
   }, [thisIsADir]);
 
   useEffect(() => {
+    // const init = webR.init();
+    // console.log(init);
     if (mode === "local") return;
     const splitQuestionMarks = href.split("?"),
       urlPrefix = window.location.protocol + "//" + window.location.host,
@@ -1200,6 +1210,7 @@ export default function App() {
                       <Expand fontSize="small" />
                     </IconButton>
                   </Tooltip>
+                  <Button onClick={experiment}>Experiment</Button>
                   <Tooltip title="Information about this screen">
                     <IconButton
                       color="info"
