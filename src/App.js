@@ -32,6 +32,7 @@ import {
   ArrowDropUp,
   ArrowCircleUp,
   Info,
+  Science,
   Compress,
   Expand,
 } from "@mui/icons-material";
@@ -86,6 +87,7 @@ export default function App() {
       let result = await webR.evalR("rnorm(10,5,1)");
       let output = await result.toArray();
       console.log("result of rnorm(10,5,1)", output);
+      setContent(output.join("\n"));
     },
     urlPrefix = window.location.protocol + "//" + window.location.host,
     { href } = window.location,
@@ -1188,10 +1190,6 @@ export default function App() {
                       onClick={() => {
                         setTopSpace(topSpace + increment);
                       }}
-                      // sx={{
-                      //   backgroundColor: buttonBackground,
-                      //   color: "yellow",
-                      // }}
                     >
                       <Compress fontSize="small" />
                     </IconButton>
@@ -1202,15 +1200,15 @@ export default function App() {
                       onClick={() => {
                         setTopSpace(topSpace - increment);
                       }}
-                      // sx={{
-                      //   backgroundColor: buttonBackground,
-                      //   color: "yellow",
-                      // }}
                     >
                       <Expand fontSize="small" />
                     </IconButton>
                   </Tooltip>
-                  <Button onClick={experiment}>Experiment</Button>
+                  <Tooltip title="Run some R code in browser">
+                    <IconButton size="small" onClick={experiment}>
+                      <Science fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Information about this screen">
                     <IconButton
                       color="info"
@@ -1292,6 +1290,24 @@ export default function App() {
                       sx={{ padding: iconPadding }}
                     >
                       <ArrowCircleUp fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {!waitGetDir && (
+                  <Tooltip title="Copy the directory to clipboard">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        const dir = fileDirectory.endsWith("/")
+                            ? fileDirectory.slice(0, -1)
+                            : fileDirectory,
+                          rx = /(\/general\/.*|\/clinical\/.*|\/Users\/.*)/g,
+                          matchDir = rx.exec(dir);
+                        navigator.clipboard.writeText(matchDir[0]);
+                      }}
+                      sx={{ ml: 1, padding: iconPadding }}
+                    >
+                      <ContentCopy fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 )}
