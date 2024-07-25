@@ -252,75 +252,6 @@ export default function App() {
       setFileType("excel");
       // console.log(tempRows, tempCols);
     },
-    // processMnf = () => {
-    //   const jsonText = xml2json(content, {
-    //       ignoreComment: true,
-    //       // alwaysChildren: true,
-    //       trim: true,
-    //       spaces: 3,
-    //     }),
-    //     json = JSON.parse(jsonText),
-    //     elements = json.elements[0].elements,
-    //     feedback = [];
-    //   console.log("elements", elements);
-    //   elements.forEach((element) => {
-    //     let chunk = "",
-    //       path = "",
-    //       file = "";
-    //     chunk += "<b><i>" + element.name + "</i></b> - ";
-    //     switch (element.name) {
-    //       case "inputs":
-    //       case "outputs":
-    //         chunk += element.elements.length + ` ${element.name}<br/>`;
-    //         element.elements.forEach((e) => {
-    //           if (e.name === "file") {
-    //             path =
-    //               e.attributes && e.attributes.uri
-    //                 ? e.attributes.uri.slice(6)
-    //                 : null;
-    //             file = path ? path.split("?")[0].split("/").pop() : null;
-    //             chunk += file
-    //               ? `<a href='${
-    //                   fileViewerPrefix + path
-    //                 }' target='_blank'>${file}</a><br/>`
-    //               : null;
-    //           }
-    //         });
-    //         chunk += "<br/>";
-    //         break;
-    //       case "job":
-    //       case "lst":
-    //         path =
-    //           element.attributes && element.attributes.uri
-    //             ? element.attributes.uri.slice(6)
-    //             : null;
-    //         file = path ? path.split("?")[0].split("/").pop() : null;
-    //         chunk += file
-    //           ? `<a href='${
-    //               fileViewerPrefix + path
-    //             }' target='_blank'>${file}</a><br/>`
-    //           : "";
-    //         break;
-    //       case "log":
-    //         path =
-    //           element.attributes && element.attributes.uri
-    //             ? element.attributes.uri.slice(6)
-    //             : null;
-    //         file = path ? path.split("?")[0].split("/").pop() : null;
-    //         chunk += file
-    //           ? `<a href='${
-    //               logViewerPrefix + path
-    //             }' target='_blank'>${file}</a><br/>`
-    //           : "";
-    //         break;
-    //       default:
-    //     }
-    //     feedback.push(chunk + "<p/>");
-    //   });
-    //   const allFeedback = feedback.join("<br/>");
-    //   setFileType("html");
-    //   setContent(allFeedback);
-    // },
     getFile = (url) => {
       console.log(url);
       // local mode for test and development
@@ -548,7 +479,6 @@ export default function App() {
       } else await getDir(webDavPrefix + dir, 1, processXml);
       setWaitGetDir(false);
     },
-    // [pageNumber, setPageNumber] = useState(0),
     [listOfFiles, setListOfFiles] = useState(null),
     analyse = (text) => {
       const pageCount = (match, offset, string) => {
@@ -563,23 +493,8 @@ export default function App() {
             "\n\n\n"
           );
         },
-        // pagebreak1 = "\n" + "-".repeat(50) + `> Page ${page}<` + "-".repeat(50) + "\n\n",
         pagebreak2 = "\n\n",
         newText = text.replace(/\f/gm, showPageBreaks ? pageCount : pagebreak2);
-      // .replace(/</gm, "&lt;")
-      // .replace(/>/gm, "&gt;")
-      // .replace(
-      //   /(\/general\/[\w|/|.|\s|-]+)/gm,
-      //   `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
-      // )
-      // .replace(
-      //   /(\/clinical\/[\w|/|.|\s|-]+)/gm,
-      //   `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
-      // )
-      // .replace(
-      //   /(\/Users\/[\w|/|.|\s|-]+)/gm,
-      //   `<a href='${fileViewerPrefix}$1' target='_blank'>$1</a>`
-      // );
       return newText;
     },
     analyseHtml = (text) => {
@@ -733,45 +648,6 @@ export default function App() {
       setOriginalContent(chunk);
       setContent(chunk);
     };
-  // experimentOptions = {
-  //   method: "put",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     "X-CSRF-TOKEN": "41d6dd33-cfa1-4a6d-9cfc-77e821ce6ec1",
-  //   },
-  //   body: JSON.stringify({
-  //     path: "/general/biostat/gadam/documents/gadam_dshb/adam_msg.sas7bdat",
-  //     location: "REPOSITORY",
-  //     version: null,
-  //     refresh: true,
-  //     includeInfo: true,
-  //     start: 0,
-  //     limit: 1000,
-  //   }),
-  // };
-  // experiment = () => {
-  //   fetch(
-  //     "https://xarprod.ondemand.sas.com/lsaf/rest/dataview/278b7216-e082-4452-9c20-e85fa1298a19/data",
-  //     experimentOptions
-  //   ).then((response) => {
-  //     console.log("response", response);
-  //   });
-  // };
-  // Iframe = (src) => {
-  //   console.log("src", src);
-  //   if (!src) {
-  //     return <div>Loading...</div>;
-  //   }
-  //   return (
-  //     // <div className="col-md-12">
-  //     //   <div className="emdeb-responsive">
-  //     <iframe src={src} title="doc-viewer"></iframe>
-  //     //   </div>
-  //     // </div>
-  //   );
-  // };
-
-  // console.log("href", href, "server", server);
 
   useEffect(() => {
     window.addEventListener("resize", detectSize);
