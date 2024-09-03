@@ -44,6 +44,7 @@ import Select from "react-select";
 import { Document, Page } from "react-pdf/dist/esm/entry.webpack";
 import Highlight from "react-highlight";
 import JSZip from "jszip";
+import { marked } from "marked";
 // import hljs from "highlight.js";
 import { read, utils } from "xlsx";
 // import { xml2json } from "xml-js";
@@ -71,6 +72,7 @@ import test_mnf from "./test/test.mnf";
 import test_mnf2 from "./test/test-new.mnf";
 import test_sas from "./test/test.sas";
 import test_csv from "./test/test.csv";
+import test_md from "./test/test.md";
 import test_nosuffix from "./test/nosuffix";
 import { WebR } from "webr";
 
@@ -252,6 +254,11 @@ export default function App() {
       setFileType("excel");
       // console.log(tempRows, tempCols);
     },
+    processMd = (resp) => {
+      console.log("resp", resp);
+      setFileType("md");
+      return marked.parse(resp);
+    },
     getFile = (url) => {
       console.log(url);
       // local mode for test and development
@@ -291,6 +298,16 @@ export default function App() {
             // console.log(response);
             response.arrayBuffer().then((resp) => {
               processExcel(resp);
+            });
+          });
+        } else if (url === "test_md") {
+          fetch(test_md).then(function (response) {
+            response.text().then(function (text) {
+              setOriginalContent(text);
+              const newText = processMd(text);
+              setContent(newText);
+              setFileType("md");
+              setFileViewerType("md");
             });
           });
         } else if (url === "test_pdf") {
@@ -403,21 +420,30 @@ export default function App() {
               setWaitGetDir(false);
             });
           });
-        } else {
-          if (splitDots.length > 0 || thisIsADir === false) {
-            setWaitGetDir(true);
-            // process file depending on file type
-            fetch(url).then(function (response) {
-              response.text().then(function (text) {
-                setOriginalContent(text);
-                const newText = analyse(text);
-                setContent(newText);
-                setFileType("txt");
-                setFileViewerType(tempFileType);
-                setWaitGetDir(false);
-              });
+        } else if (["md"].includes(tempFileType)) {
+          fetch(url).then(function (response) {
+            response.text().then(function (text) {
+              setOriginalContent(text);
+              const newText = processMd(text);
+              setContent(newText);
+              setFileType(tempFileType);
+              setFileViewerType(tempFileType);
+              setWaitGetDir(false);
             });
-          }
+          });
+        } else if (splitDots.length > 0 || thisIsADir === false) {
+          setWaitGetDir(true);
+          // process file depending on file type
+          fetch(url).then(function (response) {
+            response.text().then(function (text) {
+              setOriginalContent(text);
+              const newText = analyse(text);
+              setContent(newText);
+              setFileType("txt");
+              setFileViewerType(tempFileType);
+              setWaitGetDir(false);
+            });
+          });
         }
       }
     },
@@ -474,7 +500,8 @@ export default function App() {
           { id: 15, value: "test_doc", label: "Word (docx)" },
           { id: 16, value: "test_nosuffix", label: "Text (no suffix)" },
           { id: 17, value: "test_zip", label: "Zip (zip)" },
-          // { id: 15, value: "test_ppt", label: "PowerPoint (ppt)" },
+          { id: 18, value: "test_md", label: "Markdown (md)" },
+          // { id: 19, value: "test_ppt", label: "PowerPoint (ppt)" },
         ]);
       } else await getDir(webDavPrefix + dir, 1, processXml);
       setWaitGetDir(false);
@@ -1310,6 +1337,15 @@ export default function App() {
                 />
                 {/* <Page pageNumber={pageNumber} /> */}
               </Document>
+            ) : ["md"].includes(fileType) ? (
+              <pre
+                // className="content"
+                style={{
+                  whiteSpace: "pre",
+                  padding: 10,
+                }}
+                dangerouslySetInnerHTML={{ __html: content }}
+              ></pre>
             ) : ["image", "png", "svg", "jpg"].includes(fileType) ? (
               <img
                 src={imageFile}
