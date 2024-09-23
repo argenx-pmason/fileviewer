@@ -41,6 +41,7 @@ import { DataGridPro } from "@mui/x-data-grid-pro";
 import { LicenseInfo } from "@mui/x-data-grid-pro";
 // libraries supporting different file types
 import Select from "react-select";
+import DOMPurify from "dompurify";
 import { Document, Page } from "react-pdf/dist/esm/entry.webpack";
 import Highlight from "react-highlight";
 import JSZip from "jszip";
@@ -78,7 +79,8 @@ import { WebR } from "webr";
 
 export default function App() {
   LicenseInfo.setLicenseKey(
-    "369a1eb75b405178b0ae6c2b51263cacTz03MTMzMCxFPTE3MjE3NDE5NDcwMDAsUz1wcm8sTE09c3Vic2NyaXB0aW9uLEtWPTI="
+    "6b1cacb920025860cc06bcaf75ee7a66Tz05NDY2MixFPTE3NTMyNTMxMDQwMDAsUz1wcm8sTE09c3Vic2NyaXB0aW9uLEtWPTI="
+
   );
   let pageNumber = 1;
 
@@ -305,7 +307,7 @@ export default function App() {
             response.text().then(function (text) {
               setOriginalContent(text);
               const newText = processMd(text);
-              setContent(newText);
+              setContent(DOMPurify.sanitize(newText));
               setFileType("md");
               setFileViewerType("md");
             });
@@ -425,7 +427,7 @@ export default function App() {
             response.text().then(function (text) {
               setOriginalContent(text);
               const newText = processMd(text);
-              setContent(newText);
+              setContent(DOMPurify.sanitize(newText));
               setFileType(tempFileType);
               setFileViewerType(tempFileType);
               setWaitGetDir(false);
